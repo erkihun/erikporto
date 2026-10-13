@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'channel_id' => env('TELEGRAM_CHANNEL_ID'),     // @channelusername or -100… numeric id
+        'announce_notes' => (bool) env('TELEGRAM_ANNOUNCE_NOTES', true),
+        'announce_projects' => (bool) env('TELEGRAM_ANNOUNCE_PROJECTS', false),
+    ],
+
 ];

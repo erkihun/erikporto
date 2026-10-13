@@ -7,9 +7,11 @@ namespace App\Queries;
 use App\Enums\Discipline;
 use App\Enums\InquiryType;
 use App\Http\Resources\ExperienceResource;
+use App\Http\Resources\NoteSummaryResource;
 use App\Http\Resources\ProfileResource;
 use App\Http\Resources\ProjectSummaryResource;
 use App\Models\Experience;
+use App\Models\Note;
 use App\Models\ProcessStep;
 use App\Models\Profile;
 use App\Models\Project;
@@ -48,6 +50,9 @@ final readonly class HomePageQuery
             'capabilities' => $this->capabilities(),
             'process' => ProcessStep::query()->ordered()->get(['id', 'title', 'description'])->toArray(),
             'experience' => ExperienceResource::collection(Experience::query()->ordered()->get())->resolve($this->request),
+            'latestNotes' => NoteSummaryResource::collection(
+                Note::query()->published()->latestFirst()->limit(3)->get(),
+            )->resolve($this->request),
             'inquiryTypes' => InquiryType::options(),
         ];
     }

@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 
+import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
 import { useTheme } from '@/hooks/useTheme';
 import { formatEthiopian } from '@/lib/ethiopian-calendar';
 
@@ -25,8 +26,9 @@ interface SiteLayoutProps {
 }
 
 export function SiteLayout({ ownerName, isHome = false, sections = true, children }: SiteLayoutProps) {
-    const { flash } = usePage().props;
+    const { flash, hasNotes } = usePage().props;
     const { toggle } = useTheme();
+    const prefetchNotes = usePrefetchOnFocus('/notes');
     const [scrolled, setScrolled] = useState(false);
     const [active, setActive] = useState<string | null>(null);
     const [toast, setToast] = useState<string | null>(null);
@@ -92,6 +94,7 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
                                     {label}
                                 </a>
                             ))}
+                            {hasNotes ? <Link href="/notes" prefetch onFocus={prefetchNotes}>Notes</Link> : null}
                         </nav>
                     ) : null}
                     <button className="icon-btn" type="button" onClick={toggle} aria-label="Toggle colour theme" style={sections ? undefined : { marginLeft: 'auto' }}>
@@ -119,9 +122,16 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
                             </>
                         ) : null}
                     </span>
-                    <a href="#main" className="mono" style={{ textDecoration: 'none' }}>
-                        Back to top ↑
-                    </a>
+                    <span className="mono" style={{ display: 'flex', gap: 18 }}>
+                        {hasNotes ? (
+                            <a href="/feed.xml" style={{ textDecoration: 'none' }}>
+                                RSS
+                            </a>
+                        ) : null}
+                        <a href="#main" style={{ textDecoration: 'none' }}>
+                            Back to top ↑
+                        </a>
+                    </span>
                 </div>
             </footer>
 

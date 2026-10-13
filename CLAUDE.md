@@ -33,7 +33,7 @@ npm run build                 # tsc + client bundle + SSR bundle
 - The visual design is final. Do not restyle anything. New UI reuses the existing tokens (`--paper`, `--ink`, `--accent`, `--f-*`, …) and classes in `resources/css/app.css`.
 - No `any` in TypeScript. No business logic in components: data comes ready-made from Resources/shared props.
 - Components are written against the React API and import from `react`; Vite aliases `react` to `resources/js/lib/preact-react.js` (preact/compat plus an SSR-safe `use()`) and `react-dom/*` to `preact/compat/*`. tsconfig `paths` does the same for types. The SSR build bundles all dependencies (`ssr.noExternal`) so Inertia resolves the alias too. Don't add a package that needs real React internals.
-- Fonts are self-hosted, subset woff2 in `resources/fonts/`, declared in the generated `resources/css/fonts.css` (unicode-range splits, metric-matched fallbacks). Never edit those by hand: change `scripts/fonts.mjs` and run `npm run fonts`. A new UI character outside the critical set goes into `CRITICAL_LATIN` (or `ETHIOPIC_CORE_TEXT`) there, or it pulls in an extra file on first view. First-view fonts budget: 100 KB.
+- Fonts are self-hosted, subset woff2 in `resources/fonts/`, declared in the generated `resources/css/fonts.css` (unicode-range splits, metric-matched fallbacks). Never edit those by hand: change `scripts/fonts.mjs` and run `npm run fonts`. A new UI character outside the critical set goes into `CRITICAL_LATIN` (or `ETHIOPIC_CORE_TEXT`) there, or it pulls in an extra file on first view. JetBrains Mono keeps all of ASCII (code blocks in notes) without programming ligatures. First-view fonts budget: 100 KB.
 - The production layout inlines the compiled stylesheet (`Vite::content`) and preloads the Archivo critical face; keep CSS under 20 KB gzip.
 - Initial JS budget is 100 KB gzip. Decorative or on-demand code loads with `import()` (see `whenIdle()` in `lib/idle.ts` and the OrgGraph engine). Inspect the bundle with `npm run analyze` (writes `storage/app/bundle-stats.html`).
 - Pages live in `resources/js/pages`, home sections in `resources/js/components/home`, layout in `components/layout/SiteLayout.tsx`.
@@ -56,3 +56,7 @@ npm run build                 # tsc + client bundle + SSR bundle
 | Seeders | `AdminUserSeeder` always; `DemoContentSeeder` only in local and tests. Production starts empty and `/` renders `ComingSoon` until a profile exists |
 | Admin access | `User::canAccessPanel()` requires `is_admin` |
 | Ethiopian calendar | `resources/js/lib/ethiopian-calendar.ts` |
+| Notes | `Note` model: draft/scheduled/published is derived from `published_at` (never stored). `body_html`, `toc`, `reading_minutes` are derived on save and are not fillable |
+| Markdown safety | `MarkdownRenderer`: `html_input=escape`, `allow_unsafe_links=false`. Never render user Markdown any other way |
+| Telegram | `AnnouncesOnTelegram` contract + `QueuesTelegramAnnouncement` trait; `AnnounceOnTelegram` job is idempotent (unique job + lock + `telegram_posted_at`) |
+| Scheduled content | `PortfolioCache` TTL is capped at the next scheduled note, so pages refresh on time without a cron |

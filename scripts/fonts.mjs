@@ -72,6 +72,10 @@ const FAMILIES = [
         axes: { wght: { min: 400, max: 500 } },
         descriptors: { 'font-weight': '400 500' },
         fallback: { name: 'JetBrains Mono Fallback', local: ['Courier New', 'Liberation Mono'], metrics: jetBrainsMonoMetrics, base: courierNewMetrics },
+        // Code blocks in notes use every ASCII symbol, so the mono face keeps all of ASCII on
+        // first view. Programming ligatures are left out (plain code, and they would triple the file).
+        criticalAscii: 'all',
+        noLayoutClosure: true,
     },
     {
         family: 'Noto Sans Ethiopic',
@@ -126,7 +130,11 @@ async function subsets(pkg, cssName) {
 
 async function build(font, name, source, codePoints) {
     const text = String.fromCodePoint(...codePoints);
-    const output = await subsetFont(await readFile(source), text, { targetFormat: 'woff2', variationAxes: font.axes });
+    const output = await subsetFont(await readFile(source), text, {
+        targetFormat: 'woff2',
+        variationAxes: font.axes,
+        noLayoutClosure: font.noLayoutClosure ?? false,
+    });
     const file = `${font.slug}-${name}.woff2`;
     await writeFile(join(fontsDir, file), output);
     console.log(`${file.padEnd(40)} ${(output.length / 1024).toFixed(1).padStart(6)} KB  (${codePoints.length} code points)`);
@@ -164,7 +172,10 @@ for (const font of FAMILIES) {
         continue;
     }
 
-    const inLatin = critical.filter((cp) => map.latin.codePoints.includes(cp) || (cp >= 0x2190 && cp <= 0x29ff));
+    const fullAscii = font.criticalAscii === 'all' ? Array.from({ length: 0x7e - 0x20 + 1 }, (_, i) => 0x20 + i) : [];
+    const inLatin = [...new Set([...critical, ...fullAscii])]
+        .filter((cp) => map.latin.codePoints.includes(cp) || (cp >= 0x2190 && cp <= 0x29ff))
+        .sort((a, b) => a - b);
     const rest = map.latin.codePoints.filter((cp) => !inLatin.includes(cp));
     const criticalFace = await build(font, 'latin-critical', map.latin.file, inLatin);
     faces.push(face(font, criticalFace));

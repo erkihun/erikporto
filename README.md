@@ -32,7 +32,9 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 
 | Concern | Where |
 | --- | --- |
-| Routes | `routes/web.php`: `/`, `/work/{slug}`, `POST /contact`, `/cv`, `/sitemap.xml` |
+| Routes | `routes/web.php`: `/`, `/work/{slug}`, `/notes`, `/notes/{slug}`, `/feed.xml`, `POST /contact`, `/cv`, `/sitemap.xml` |
+| Notes | `App\Models\Note` (state derived from `published_at`), Markdown rendered safely on save by `App\Support\Markdown\MarkdownRenderer` |
+| Telegram | `AnnounceOnTelegram` job (idempotent) + `portfolio:announce` every 5 minutes; disabled until `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHANNEL_ID` are set |
 | Page data | `app/Queries/HomePageQuery.php` and `ProjectController`, both cached |
 | API contracts | `app/Http/Resources/*` ⇄ `resources/js/types/portfolio.ts` |
 | Contact workflow | `StoreContactMessageRequest` → `SubmitContactMessage` action → queued `NewContactMessage` notification |
@@ -54,6 +56,8 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 - `APP_ENV=production`, `APP_DEBUG=false` and the real `APP_URL`
 - MySQL configured in `.env` (the migrations work on both SQLite and MySQL)
 - A mail driver, plus a queue worker under Supervisor
+- The scheduler cron (`* * * * * php artisan schedule:run`) so scheduled notes are announced on Telegram
+- Telegram (optional): create a bot with @BotFather, add it as an admin of your channel, set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHANNEL_ID`
 - `php artisan inertia:start-ssr` under Supervisor
 - `php artisan optimize` and `php artisan filament:optimize` on each deploy
 - Real screenshots uploaded in **Admin → Projects → Media** to replace the illustrated placeholders

@@ -96,12 +96,55 @@ export interface Option<T extends string = string> {
     label: string;
 }
 
+export interface NoteSummary {
+    slug: string;
+    title: string;
+    excerpt: string;
+    tags: string[];
+    reading_minutes: number;
+    published_at: string; // ISO 8601
+    cover_url: string | null;
+    url: string;
+}
+
+export interface TocEntry {
+    id: string;
+    text: string;
+    level: 2 | 3;
+}
+
+export interface NoteDetail extends NoteSummary {
+    /** Server-rendered Markdown; raw HTML in the source is escaped by MarkdownRenderer. */
+    body_html: string;
+    toc: TocEntry[];
+    updated_at: string;
+}
+
+export interface Owner {
+    name: string | null;
+    email: string | null;
+}
+
+export interface NotesIndexProps {
+    notes: NoteSummary[];
+    pagination: { page: number; prev: string | null; next: string | null };
+    owner: Owner;
+}
+
+export interface NoteShowProps {
+    note: NoteDetail;
+    older: NoteSummary | null;
+    newer: NoteSummary | null;
+    owner: Owner;
+}
+
 export interface HomePageProps {
     profile: Profile;
     projects: ProjectSummary[];
     capabilities: Capability[];
     process: ProcessStep[];
     experience: Experience[];
+    latestNotes: NoteSummary[];
     inquiryTypes: Option<InquiryType>[];
 }
 
@@ -109,5 +152,5 @@ export interface ProjectPageProps {
     project: ProjectDetail;
     position: { index: number; total: number };
     next: ProjectSummary | null;
-    owner: { name: string | null; email: string | null };
+    owner: Owner;
 }

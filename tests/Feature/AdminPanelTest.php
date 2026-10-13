@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Enums\NoteStatus;
 use App\Filament\Resources\ContactMessages\Pages\ViewContactMessage;
+use App\Filament\Resources\Notes\Pages\CreateNote;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Models\ContactMessage;
+use App\Models\Note;
 use App\Models\Profile;
 use App\Models\Project;
 use App\Models\User;
@@ -77,4 +80,31 @@ it('marks a message as read when an admin opens it', function (): void {
     Livewire::test(ViewContactMessage::class, ['record' => $message->getRouteKey()])->assertOk();
 
     expect($message->fresh()->read_at)->not->toBeNull();
+});
+
+it('creates a scheduled note from the admin form', function (): void {
+    $this->actingAs(User::factory()->admin()->create());
+
+    Livewire::test(CreateNote::class)
+        ->fillForm([
+            'title' => 'Ethiopian dates in Laravel',
+            'slug' => 'ethiopian-dates-in-laravel',
+            'excerpt' => 'How I store and display E.C. dates.',
+            'body' => "## Storage\n\nAlways store G.C.",
+            'published_at' => now()->addDay()->format('Y-m-d H:i'),
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $note = Note::sole();
+    expect($note->status)->toBe(NoteStatus::Scheduled)
+        ->and($note->body_html)->toContain('id="storage"');
+});
+
+it('lets admins open the notes screens', function (): void {
+    $this->actingAs(User::factory()->admin()->create());
+
+    $this->get('/admin/notes')->assertOk();
+    $this->get('/admin/notes/create')->assertOk();
+    $this->get('/admin/notes/'.Note::factory()->create()->slug.'/edit')->assertOk();
 });
