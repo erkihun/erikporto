@@ -8,6 +8,7 @@ use App\Http\Resources\NoteResource;
 use App\Http\Resources\NoteSummaryResource;
 use App\Models\Note;
 use App\Models\Profile;
+use App\Support\Images\ResponsiveImages;
 use App\Support\PortfolioCache;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -23,6 +24,7 @@ final class NoteController extends Controller
 
         $props = PortfolioCache::remember("notes:page:{$page}", static function () use ($request, $page): array {
             $paginator = Note::query()->published()->latestFirst()->simplePaginate(self::PER_PAGE, page: $page);
+            app(ResponsiveImages::class)->preload(array_map(static fn (Note $note): ?string => $note->cover_path, $paginator->items()));
 
             return [
                 'notes' => NoteSummaryResource::collection($paginator->items())->resolve($request),

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\FlushesPortfolioCache;
+use App\Models\Concerns\HasImages;
 use App\Models\Concerns\HasLocalizedContent;
 use Database\Factories\ProfileFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
 final class Profile extends Model
 {
     /** @use HasFactory<ProfileFactory> */
-    use FlushesPortfolioCache, HasFactory, HasLocalizedContent;
+    use FlushesPortfolioCache, HasFactory, HasImages, HasLocalizedContent;
 
     /** @var list<string> English and Amharic per field; the slug, URLs, tags and enums are not translated. */
     public array $translatable = ['headline', 'lede', 'bio', 'about_statement', 'location', 'meta_description'];
@@ -33,6 +34,12 @@ final class Profile extends Model
     public static function current(): ?self
     {
         return self::query()->oldest('id')->first();
+    }
+
+    /** The portrait; the CV is a private PDF and not part of the image pipeline. */
+    public function imageAttributes(): array
+    {
+        return ['avatar_path'];
     }
 
     protected function casts(): array

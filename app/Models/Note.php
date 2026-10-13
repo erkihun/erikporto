@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\AnnouncesOnTelegram;
 use App\Models\Concerns\FlushesPortfolioCache;
+use App\Models\Concerns\HasImages;
 use App\Models\Concerns\HasPublicationDate;
 use App\Models\Concerns\QueuesTelegramAnnouncement;
 use App\Support\Markdown\MarkdownRenderer;
@@ -24,7 +25,7 @@ use Illuminate\Support\Carbon;
 final class Note extends Model implements AnnouncesOnTelegram
 {
     /** @use HasFactory<NoteFactory> */
-    use FlushesPortfolioCache, HasFactory, HasPublicationDate, QueuesTelegramAnnouncement;
+    use FlushesPortfolioCache, HasFactory, HasImages, HasPublicationDate, QueuesTelegramAnnouncement;
 
     public const TELEGRAM_TOGGLE = 'announce_notes';
 
@@ -34,6 +35,24 @@ final class Note extends Model implements AnnouncesOnTelegram
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function imageAttributes(): array
+    {
+        return ['cover_path'];
+    }
+
+    public function markdownImageAttributes(): array
+    {
+        return ['body' => 'notes/attachments'];
+    }
+
+    /** Re-renders the body (the saving hook below) without touching updated_at. */
+    public function refreshRenderedMarkdown(): void
+    {
+        $this->timestamps = false;
+        $this->forceFill(['body_html' => ''])->save();
+        $this->timestamps = true;
     }
 
     protected static function booted(): void

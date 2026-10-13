@@ -29,11 +29,19 @@ export interface Profile {
     location: string | null;
     email: string | null;
     is_available: boolean;
-    avatar_url: string | null;
+    avatar: ResponsiveImage | null;
     cv_url: string | null;
     social_links: SocialLink[];
     facts: Fact[];
     meta_description: string;
+}
+
+/** Mirrors App\Support\Images\ResponsiveImages::for(): srcset and size appear once the upload is processed. */
+export interface ResponsiveImage {
+    url: string;
+    srcset: string | null;
+    width: number | null;
+    height: number | null;
 }
 
 export interface ProjectSummary {
@@ -45,7 +53,7 @@ export interface ProjectSummary {
     summary: string;
     year: number | null;
     stack: string[];
-    cover_url: string | null;
+    cover: ResponsiveImage | null;
     mock: ProjectMockKind | null;
     url: string;
 }
@@ -59,7 +67,7 @@ export interface ProjectDetail extends ProjectSummary {
     tools: string[];
     repository_url: string | null;
     live_url: string | null;
-    gallery_urls: string[];
+    gallery: ResponsiveImage[];
 }
 
 export interface CapabilityGroup {
@@ -103,7 +111,7 @@ export interface NoteSummary {
     tags: string[];
     reading_minutes: number;
     published_at: string; // ISO 8601
-    cover_url: string | null;
+    cover: ResponsiveImage | null;
     url: string;
 }
 

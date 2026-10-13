@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NowUpdates\Schemas;
 
 use App\Enums\NoteStatus;
+use App\Filament\Support\ImageUpload;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Infolists\Components\TextEntry;
@@ -23,12 +24,10 @@ final class NowUpdateForm
             ->components([
                 Grid::make(1)->columnSpan(2)->schema([
                     Section::make()->schema([
-                        MarkdownEditor::make('body')
+                        ImageUpload::markdown(MarkdownEditor::make('body'), 'now/attachments')
                             ->label('What you are doing now')
                             ->required()
                             ->minHeight('20rem')
-                            ->fileAttachmentsDisk('public')
-                            ->fileAttachmentsDirectory('now/attachments')
                             ->helperText('Markdown. A few short paragraphs or a list. Raw HTML is shown as text, not rendered.'),
                     ]),
                 ]),

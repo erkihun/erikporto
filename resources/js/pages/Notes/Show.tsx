@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { SiteLayout } from '@/components/layout/SiteLayout';
 import { ArrowLeft } from '@/components/ui/icons';
+import { ResponsiveImg } from '@/components/ui/ResponsiveImg';
 import { Seo } from '@/components/ui/Seo';
 import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
 import { useTrans } from '@/hooks/useTrans';
@@ -17,7 +18,7 @@ export default function NoteShow({ note, older, newer, owner }: NoteShowProps) {
 
     return (
         <SiteLayout ownerName={owner.name ?? 'Portfolio'}>
-            <Seo title={note.title} description={note.excerpt} image={note.cover_url} type="article" />
+            <Seo title={note.title} description={note.excerpt} image={note.cover?.url} type="article" />
 
             <article className="wrap page-enter">
                 <header className="cs-hero note-hero">
@@ -31,9 +32,9 @@ export default function NoteShow({ note, older, newer, owner }: NoteShowProps) {
                     <p className="sub">{note.excerpt}</p>
                 </header>
 
-                {note.cover_url ? (
+                {note.cover ? (
                     <div className="cs-cover" style={{ marginBottom: 24 }}>
-                        <img src={note.cover_url} alt="" />
+                        <ResponsiveImg image={note.cover} alt="" sizes="(min-width: 1240px) 1200px, 100vw" eager />
                     </div>
                 ) : null}
 

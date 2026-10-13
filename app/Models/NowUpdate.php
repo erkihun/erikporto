@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\FlushesPortfolioCache;
+use App\Models\Concerns\HasImages;
 use App\Models\Concerns\HasPublicationDate;
 use App\Support\Markdown\MarkdownRenderer;
 use Database\Factories\NowUpdateFactory;
@@ -19,7 +20,7 @@ use Illuminate\Support\Str;
 final class NowUpdate extends Model
 {
     /** @use HasFactory<NowUpdateFactory> */
-    use FlushesPortfolioCache, HasFactory, HasPublicationDate;
+    use FlushesPortfolioCache, HasFactory, HasImages, HasPublicationDate;
 
     // body_html is rendered on save and never accepted as input.
     protected $fillable = ['body', 'published_at'];
@@ -30,6 +31,24 @@ final class NowUpdate extends Model
         $text = html_entity_decode(strip_tags((string) $this->body_html), ENT_QUOTES | ENT_HTML5);
 
         return Str::limit(Str::squish($text), $limit);
+    }
+
+    public function imageAttributes(): array
+    {
+        return [];
+    }
+
+    public function markdownImageAttributes(): array
+    {
+        return ['body' => 'now/attachments'];
+    }
+
+    /** Re-renders the body (the saving hook below) without touching updated_at. */
+    public function refreshRenderedMarkdown(): void
+    {
+        $this->timestamps = false;
+        $this->forceFill(['body_html' => ''])->save();
+        $this->timestamps = true;
     }
 
     protected static function booted(): void

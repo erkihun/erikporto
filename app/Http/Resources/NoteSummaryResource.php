@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\Note;
+use App\Support\Images\ResponsiveImages;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Keep in sync with `NoteSummary` in resources/js/types/portfolio.ts.
@@ -26,7 +26,7 @@ class NoteSummaryResource extends JsonResource
             'tags' => $this->tags ?? [],
             'reading_minutes' => $this->reading_minutes,
             'published_at' => $this->published_at?->toIso8601String(),
-            'cover_url' => $this->cover_path ? Storage::disk('public')->url($this->cover_path) : null,
+            'cover' => app(ResponsiveImages::class)->for($this->cover_path),
             'url' => route('notes.show', $this->resource, absolute: false),
         ];
     }

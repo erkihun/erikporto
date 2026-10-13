@@ -2,6 +2,8 @@ import { useTrans } from '@/hooks/useTrans';
 import type { TransKey } from '@/types/inertia';
 import type { Profile } from '@/types/portfolio';
 
+import { ResponsiveImg } from '../ui/ResponsiveImg';
+
 const PRINCIPLES: readonly (readonly [TransKey, TransKey])[] = [
     ['about.usable_title', 'about.usable_text'],
     ['about.secure_title', 'about.secure_text'],
@@ -15,8 +17,8 @@ export function About({ profile }: { profile: Profile }) {
         <section className="block wrap" id="about">
             <div className="about">
                 <div className="portrait rv">
-                    {profile.avatar_url ? (
-                        <img src={profile.avatar_url} alt={t('about.portrait_alt', { name: profile.name })} loading="lazy" />
+                    {profile.avatar ? (
+                        <ResponsiveImg image={profile.avatar} alt={t('about.portrait_alt', { name: profile.name })} sizes="(min-width: 900px) 380px, 80vw" />
                     ) : (
                         <span className="initials" aria-hidden="true">
                             {profile.name

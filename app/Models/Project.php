@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Contracts\AnnouncesOnTelegram;
 use App\Enums\ProjectCategory;
 use App\Models\Concerns\FlushesPortfolioCache;
+use App\Models\Concerns\HasImages;
 use App\Models\Concerns\HasLocalizedContent;
 use App\Models\Concerns\QueuesTelegramAnnouncement;
 use Database\Factories\ProjectFactory;
@@ -27,7 +28,7 @@ use Illuminate\Support\Carbon;
 final class Project extends Model implements AnnouncesOnTelegram
 {
     /** @use HasFactory<ProjectFactory> */
-    use FlushesPortfolioCache, HasFactory, HasLocalizedContent, QueuesTelegramAnnouncement;
+    use FlushesPortfolioCache, HasFactory, HasImages, HasLocalizedContent, QueuesTelegramAnnouncement;
 
     /** @var list<string> English and Amharic per field; the slug, URLs, tags and enums are not translated. */
     public array $translatable = ['title', 'subtitle', 'summary', 'problem', 'role', 'solution', 'outcome'];
@@ -45,6 +46,11 @@ final class Project extends Model implements AnnouncesOnTelegram
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function imageAttributes(): array
+    {
+        return ['cover_path', 'gallery'];
     }
 
     /** @param Builder<self> $query */

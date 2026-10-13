@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Notes\Schemas;
 
 use App\Enums\NoteStatus;
+use App\Filament\Support\ImageUpload;
 use App\Models\Note;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -50,11 +50,9 @@ final class NoteForm
                             ->maxLength(300)
                             ->rows(2)
                             ->helperText('Shown in lists, the RSS feed, link previews and the Telegram post.'),
-                        MarkdownEditor::make('body')
+                        ImageUpload::markdown(MarkdownEditor::make('body'), 'notes/attachments')
                             ->required()
                             ->minHeight('28rem')
-                            ->fileAttachmentsDisk('public')
-                            ->fileAttachmentsDirectory('notes/attachments')
                             ->helperText('Markdown. Raw HTML is shown as text, not rendered. Use ## and ### headings to build the table of contents.'),
                     ]),
                 ]),
@@ -80,13 +78,8 @@ final class NoteForm
                     ]),
                     Section::make('Details')->schema([
                         TagsInput::make('tags')->placeholder('Add tag'),
-                        FileUpload::make('cover_path')
-                            ->label('Cover image')
-                            ->image()
-                            ->disk('public')
-                            ->directory('notes/covers')
-                            ->visibility('public')
-                            ->maxSize(4096),
+                        ImageUpload::make('cover_path', 'notes/covers')
+                            ->label('Cover image'),
                     ]),
                 ]),
             ]);

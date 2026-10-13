@@ -37,7 +37,12 @@ export function ProjectCard({ project, hidden }: { project: ProjectSummary; hidd
             onPointerLeave={onLeave}
         >
             <span className="shot">
-                <ProjectVisual coverUrl={project.cover_url} mock={project.mock} alt={t('work.screenshot_alt', { title: project.title })} />
+                <ProjectVisual
+                    cover={project.cover}
+                    mock={project.mock}
+                    alt={t('work.screenshot_alt', { title: project.title })}
+                    sizes="(min-width: 1180px) 560px, (min-width: 760px) 50vw, 100vw"
+                />
             </span>
             <span className="open">
                 <ArrowUpRight />

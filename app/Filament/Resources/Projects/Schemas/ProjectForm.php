@@ -6,9 +6,9 @@ namespace App\Filament\Resources\Projects\Schemas;
 
 use App\Enums\Locale;
 use App\Enums\ProjectCategory;
+use App\Filament\Support\ImageUpload;
 use App\Filament\Support\LocaleTabs;
 use App\Models\Project;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -73,23 +73,13 @@ final class ProjectForm
                                 ->defaultItems(0),
                         ]),
                     Section::make('Media')->schema([
-                        FileUpload::make('cover_path')
+                        ImageUpload::make('cover_path', 'projects/covers')
                             ->label('Cover screenshot')
-                            ->image()
-                            ->disk('public')
-                            ->directory('projects/covers')
-                            ->visibility('public')
-                            ->maxSize(4096)
                             ->imageEditor()
                             ->helperText('16:10 works best. Without a cover, the illustrated placeholder below is shown.'),
-                        FileUpload::make('gallery')
-                            ->image()
+                        ImageUpload::make('gallery', 'projects/gallery')
                             ->multiple()
                             ->reorderable()
-                            ->disk('public')
-                            ->directory('projects/gallery')
-                            ->visibility('public')
-                            ->maxSize(4096)
                             ->maxFiles(12),
                         Select::make('mock')
                             ->label('Placeholder illustration')

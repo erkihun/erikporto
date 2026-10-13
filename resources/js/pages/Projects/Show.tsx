@@ -4,6 +4,7 @@ import { ProjectVisual } from '@/components/home/ProjectMock';
 import { SiteLayout } from '@/components/layout/SiteLayout';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from '@/components/ui/icons';
 import { Placeholder } from '@/components/ui/Placeholder';
+import { ResponsiveImg } from '@/components/ui/ResponsiveImg';
 import { Seo } from '@/components/ui/Seo';
 import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
 import { useTrans } from '@/hooks/useTrans';
@@ -24,7 +25,7 @@ export default function ProjectShow({ project, position, next, owner }: ProjectP
 
     return (
         <SiteLayout ownerName={owner.name ?? 'Portfolio'}>
-            <Seo title={project.title} description={project.summary} image={project.cover_url} type="article" />
+            <Seo title={project.title} description={project.summary} image={project.cover?.url} type="article" />
 
             <article className="wrap page-enter">
                 <header className="cs-hero">
@@ -40,7 +41,13 @@ export default function ProjectShow({ project, position, next, owner }: ProjectP
                 </header>
 
                 <div className="cs-cover">
-                    <ProjectVisual coverUrl={project.cover_url} mock={project.mock} alt={t('case.cover_alt', { title: project.title })} />
+                    <ProjectVisual
+                        cover={project.cover}
+                        mock={project.mock}
+                        alt={t('case.cover_alt', { title: project.title })}
+                        sizes="(min-width: 1240px) 1200px, 100vw"
+                        eager
+                    />
                 </div>
 
                 <div className="cs-layout">
@@ -68,12 +75,17 @@ export default function ProjectShow({ project, position, next, owner }: ProjectP
                             )}
                         </section>
 
-                        {project.gallery_urls.length > 0 ? (
+                        {project.gallery.length > 0 ? (
                             <section className="cs-block rv">
                                 <h2 className="mono" style={{ fontFamily: 'var(--f-mono)', fontSize: 12, color: 'var(--muted)' }}>{t('case.gallery')}</h2>
                                 <div className="gallery">
-                                    {project.gallery_urls.map((src, i) => (
-                                        <img key={src} src={src} alt={t('case.gallery_alt', { title: project.title, n: i + 1 })} loading="lazy" decoding="async" />
+                                    {project.gallery.map((image, i) => (
+                                        <ResponsiveImg
+                                            key={image.url}
+                                            image={image}
+                                            alt={t('case.gallery_alt', { title: project.title, n: i + 1 })}
+                                            sizes="(min-width: 1100px) 380px, (min-width: 640px) 45vw, 100vw"
+                                        />
                                     ))}
                                 </div>
                             </section>

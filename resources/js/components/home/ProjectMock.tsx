@@ -1,4 +1,6 @@
-import type { ProjectMockKind } from '@/types/portfolio';
+import type { ProjectMockKind, ResponsiveImage } from '@/types/portfolio';
+
+import { ResponsiveImg } from '../ui/ResponsiveImg';
 
 /**
  * Illustrated stand-in shown until a real screenshot is uploaded in the admin panel.
@@ -129,6 +131,14 @@ export function ProjectMock({ kind }: { kind: ProjectMockKind | null }) {
 }
 
 /** Real screenshot when uploaded, illustrated mock otherwise. */
-export function ProjectVisual({ coverUrl, mock, alt }: { coverUrl: string | null; mock: ProjectMockKind | null; alt: string }) {
-    return coverUrl ? <img src={coverUrl} alt={alt} loading="lazy" decoding="async" /> : <ProjectMock kind={mock} />;
+interface ProjectVisualProps {
+    cover: ResponsiveImage | null;
+    mock: ProjectMockKind | null;
+    alt: string;
+    sizes: string;
+    eager?: boolean;
+}
+
+export function ProjectVisual({ cover, mock, alt, sizes, eager = false }: ProjectVisualProps) {
+    return cover ? <ResponsiveImg image={cover} alt={alt} sizes={sizes} eager={eager} /> : <ProjectMock kind={mock} />;
 }

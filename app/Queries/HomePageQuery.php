@@ -17,6 +17,7 @@ use App\Models\ProcessStep;
 use App\Models\Profile;
 use App\Models\Project;
 use App\Models\SkillGroup;
+use App\Support\Images\ResponsiveImages;
 use App\Support\PortfolioCache;
 use Illuminate\Http\Request;
 
@@ -44,6 +45,8 @@ final readonly class HomePageQuery
         }
 
         $projects = Project::query()->published()->ordered()->get();
+        $notes = Note::query()->published()->latestFirst()->limit(3)->get();
+        app(ResponsiveImages::class)->preload([$profile->avatar_path, ...$projects->pluck('cover_path'), ...$notes->pluck('cover_path')]);
 
         return [
             'profile' => (new ProfileResource($profile))->resolve($this->request),
@@ -51,9 +54,7 @@ final readonly class HomePageQuery
             'capabilities' => $this->capabilities(),
             'process' => ProcessStepResource::collection(ProcessStep::query()->ordered()->get())->resolve($this->request),
             'experience' => ExperienceResource::collection(Experience::query()->ordered()->get())->resolve($this->request),
-            'latestNotes' => NoteSummaryResource::collection(
-                Note::query()->published()->latestFirst()->limit(3)->get(),
-            )->resolve($this->request),
+            'latestNotes' => NoteSummaryResource::collection($notes)->resolve($this->request),
             'inquiryTypes' => InquiryType::options(),
         ];
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Profiles\Schemas;
 
 use App\Enums\Locale;
+use App\Filament\Support\ImageUpload;
 use App\Filament\Support\LocaleTabs;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -69,14 +70,9 @@ final class ProfileForm
                             ->itemLabel(static fn (array $state): ?string => $state['label'] ?? null),
                     ]),
                     Section::make('Files')->schema([
-                        FileUpload::make('avatar_path')
+                        ImageUpload::make('avatar_path', 'profile')
                             ->label('Portrait')
-                            ->image()
                             ->avatar()
-                            ->disk('public')
-                            ->directory('profile')
-                            ->visibility('public')
-                            ->maxSize(2048)
                             ->imageEditor(),
                         FileUpload::make('cv_path')
                             ->label('CV (PDF)')

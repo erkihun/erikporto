@@ -14,7 +14,7 @@ import type { HomePageProps } from '@/types/portfolio';
 export default function Home({ profile, projects, capabilities, process, experience, latestNotes, inquiryTypes }: HomePageProps) {
     return (
         <SiteLayout ownerName={profile.name} isHome>
-            <Seo description={profile.meta_description} image={profile.avatar_url} />
+            <Seo description={profile.meta_description} image={profile.avatar?.url} />
             <Hero profile={profile} />
             <StackStrip capabilities={capabilities} facts={profile.facts} />
             <WorkSection projects={projects} />

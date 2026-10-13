@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Markdown;
 
 use League\CommonMark\Environment\Environment;
+use League\CommonMark\Event\DocumentParsedEvent;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\CommonMark\Node\Block\Heading;
 use League\CommonMark\Extension\ExternalLink\ExternalLinkExtension;
@@ -93,6 +94,7 @@ final class MarkdownRenderer
         $environment->addExtension(new GithubFlavoredMarkdownExtension);
         $environment->addExtension(new HeadingPermalinkExtension);
         $environment->addExtension(new ExternalLinkExtension);
+        $environment->addEventListener(DocumentParsedEvent::class, new ResponsiveMarkdownImages);
 
         return $this->converter = new MarkdownConverter($environment);
     }
