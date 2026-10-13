@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 import { ProjectVisual } from '@/components/home/ProjectMock';
 import { SiteLayout } from '@/components/layout/SiteLayout';
@@ -8,6 +9,7 @@ import { ResponsiveImg } from '@/components/ui/ResponsiveImg';
 import { Seo } from '@/components/ui/Seo';
 import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
 import { useTrans } from '@/hooks/useTrans';
+import { COVER, forward, setActiveProject, TITLE } from '@/lib/view-transitions';
 import type { ProjectPageProps } from '@/types/portfolio';
 
 export default function ProjectShow({ project, position, next, owner }: ProjectPageProps) {
@@ -16,6 +18,9 @@ export default function ProjectShow({ project, position, next, owner }: ProjectP
     const isDesign = project.category === 'design';
     const prefetchHome = usePrefetchOnFocus(urls.home);
     const prefetchNext = usePrefetchOnFocus(next?.url ?? urls.home);
+
+    // Going back home, this project's card takes the shared cover/title names.
+    useEffect(() => setActiveProject(project.slug), [project.slug]);
     const sections: [string, string][] = [
         [t('case.problem'), project.problem],
         [t('case.role'), project.role],
@@ -29,18 +34,18 @@ export default function ProjectShow({ project, position, next, owner }: ProjectP
 
             <article className="wrap page-enter">
                 <header className="cs-hero">
-                    <Link className="back mono" href={`${urls.home}#work`} prefetch onFocus={prefetchHome}>
+                    <Link className="back mono" href={`${urls.home}#work`} prefetch viewTransition={forward} onFocus={prefetchHome}>
                         <ArrowLeft width={14} height={14} /> {t('case.all_work')}
                     </Link>
                     <span className="kicker mono">
                         {t('case.kind_line', { kind: project.kind, index: position.index, total: position.total })}
                         {project.year ? ` · ${project.year}` : ''}
                     </span>
-                    <h1>{project.title}</h1>
+                    <h1 style={{ viewTransitionName: TITLE }}>{project.title}</h1>
                     {project.subtitle ? <p className="sub">{project.subtitle}</p> : null}
                 </header>
 
-                <div className="cs-cover">
+                <div className="cs-cover" style={{ viewTransitionName: COVER }}>
                     <ProjectVisual
                         cover={project.cover}
                         mock={project.mock}
@@ -126,7 +131,7 @@ export default function ProjectShow({ project, position, next, owner }: ProjectP
                 </div>
 
                 {next ? (
-                    <Link className="next rv" href={next.url} prefetch onFocus={prefetchNext} style={{ marginBottom: 'clamp(48px,8vw,96px)' }}>
+                    <Link className="next rv" href={next.url} prefetch viewTransition={forward} onFocus={prefetchNext} style={{ marginBottom: 'clamp(48px,8vw,96px)' }}>
                         <div>
                             <span className="kicker mono">{t('case.next')}</span>
                             <h2>{next.title}</h2>

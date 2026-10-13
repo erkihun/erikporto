@@ -3,6 +3,7 @@ import { useRef, type PointerEvent } from 'react';
 
 import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
 import { useTrans } from '@/hooks/useTrans';
+import { claimSharedNames, forward, sharedNames } from '@/lib/view-transitions';
 import type { ProjectSummary } from '@/types/portfolio';
 
 import { ArrowUpRight } from '../ui/icons';
@@ -25,18 +26,21 @@ export function ProjectCard({ project, hidden }: { project: ProjectSummary; hidd
         ref.current?.style.setProperty('--ry', '0deg');
     };
     const extra = project.stack.length - 4;
+    const names = sharedNames(project.slug);
 
     return (
         <Link
             ref={ref}
             href={project.url}
             prefetch
+            viewTransition={forward}
+            onClick={() => ref.current && claimSharedNames(project.slug, ref.current)}
             onFocus={prefetchOnFocus}
             className={`card rv ${hidden ? 'hide' : ''}`}
             onPointerMove={onMove}
             onPointerLeave={onLeave}
         >
-            <span className="shot">
+            <span className="shot" style={{ viewTransitionName: names.cover }}>
                 <ProjectVisual
                     cover={project.cover}
                     mock={project.mock}
@@ -52,7 +56,7 @@ export function ProjectCard({ project, hidden }: { project: ProjectSummary; hidd
                     <span>{project.kind}</span>
                     <span>{project.year ?? t('work.case_study')}</span>
                 </span>
-                <h3>{project.title}</h3>
+                <h3 style={{ viewTransitionName: names.title }}>{project.title}</h3>
                 <p>{project.summary}</p>
                 <span className="tags">
                     {project.stack.slice(0, 4).map((s) => (

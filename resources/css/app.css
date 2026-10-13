@@ -362,3 +362,15 @@ html[lang="am"] :is(.mono,.stage .mode button,.cap h3 small,.prose th){letter-sp
 .err-graph figcaption{display:flex;justify-content:space-between;gap:12px;padding:12px 18px;border-top:1px solid var(--line);color:var(--muted)}
 .err-missing{animation:err-pulse 2.4s var(--ease) infinite}
 @keyframes err-pulse{50%{opacity:.35}}
+
+/* View transitions (lib/view-transitions.ts): the cover and title travel between a project card and
+   its case study; the page slides forward on links and back on the browser's back button. */
+::view-transition-group(project-cover),::view-transition-group(project-title){animation-duration:.5s;animation-timing-function:var(--ease)}
+::view-transition-old(project-title),::view-transition-new(project-title){height:100%;object-fit:none;object-position:left top}
+html[data-vt="forward"]{--vt-shift:28px}
+html[data-vt="back"]{--vt-shift:-28px}
+html[data-vt]::view-transition-old(root){animation:vt-out .3s var(--ease) both}
+html[data-vt]::view-transition-new(root){animation:vt-in .3s var(--ease) both}
+@keyframes vt-out{to{opacity:0;transform:translateX(calc(var(--vt-shift) * -1))}}
+@keyframes vt-in{from{opacity:0;transform:translateX(var(--vt-shift))}}
+@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
