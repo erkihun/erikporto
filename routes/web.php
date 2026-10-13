@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\CvDownloadController;
+use App\Http\Controllers\FallbackController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NoteController;
@@ -35,3 +36,6 @@ Route::get('/now', NowController::class)->name('now');
 
 Route::get('/cv', CvDownloadController::class)->middleware('throttle:30,1')->name('cv.download');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+
+// Last: unknown URLs get the designed 404 in the language of their path.
+Route::fallback(FallbackController::class)->middleware('locale');

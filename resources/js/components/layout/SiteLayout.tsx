@@ -42,7 +42,7 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
     const href = (id: string) => (isHome ? `#${id}` : `${urls.home}#${id}`);
     const links = SECTIONS.filter(([id]) => homeSections.includes(id));
 
-    useEffect(() => setToast(flash.success), [flash.success]);
+    useEffect(() => setToast(flash.success ?? flash.error), [flash.success, flash.error]);
     const clearToast = useCallback(() => setToast(null), []);
 
     // Dates are client-only so SSR markup never disagrees with the visitor's local day.

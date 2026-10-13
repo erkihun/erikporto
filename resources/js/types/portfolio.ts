@@ -178,3 +178,12 @@ export interface ProjectPageProps {
     next: ProjectSummary | null;
     owner: Owner;
 }
+
+/** Statuses rendered by App\Http\Responses\ErrorPage. */
+export type ErrorStatus = 403 | 404 | 429 | 500 | 503;
+
+/** Mirrors App\Queries\ErrorPageQuery::props(). */
+export interface ErrorPageProps {
+    status: ErrorStatus;
+    owner: { name: string };
+}

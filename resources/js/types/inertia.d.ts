@@ -31,7 +31,7 @@ export interface SharedProps {
     hasNow: boolean;
     /** Home section anchors that have content, in page order. */
     homeSections: string[];
-    flash: { success: string | null };
+    flash: { success: string | null; error: string | null };
     errors: Record<string, string>;
     [key: string]: unknown;
 }

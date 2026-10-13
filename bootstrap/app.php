@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetLocale;
+use App\Http\Responses\ErrorPage;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -27,5 +28,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToPriorityList(before: [ThrottleRequests::class, SubstituteBindings::class], prepend: SetLocale::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // 403/404/429/500/503 as designed pages; 419 back to the form with a message.
+        $exceptions->respond(new ErrorPage);
     })->create();
