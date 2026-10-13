@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "tsc --noEmit && vite build && vite build --ssr",
+        "build": "tsc --noEmit && vite build && vite build --ssr && node scripts/build-meta.mjs",
         "build:client": "vite build",
         "analyze": "vite build --mode analyze",
         "fonts": "node scripts/fonts.mjs",

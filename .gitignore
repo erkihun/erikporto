@@ -27,3 +27,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# CI reports (scripts/quality-report.mjs)
+/junit.xml
+/quality.json

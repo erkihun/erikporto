@@ -25,6 +25,20 @@ return [
      */
     'notify_email' => env('PORTFOLIO_NOTIFY_EMAIL'),
 
+    /*
+     * Public source repository (e.g. https://github.com/you/portfolio), linked from the
+     * colophon with the deployed commit. deploy/deploy.sh also fetches the last CI quality
+     * report (tests, Lighthouse) from its "quality" release. Leave empty to hide both.
+     */
+    'repo_url' => env('PORTFOLIO_REPO_URL'),
+
+    /*
+     * Colophon data files (see AppSupportBuildMeta): written by `npm run build` and by
+     * deploy/deploy.sh from the last CI run.
+     */
+    'build_meta' => public_path('build/build-meta.json'),
+    'quality_report' => storage_path('app/quality.json'),
+
     'contact' => [
         'per_minute' => (int) env('PORTFOLIO_CONTACT_PER_MINUTE', 3),
         'per_day' => (int) env('PORTFOLIO_CONTACT_PER_DAY', 10),

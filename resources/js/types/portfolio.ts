@@ -187,3 +187,21 @@ export interface ErrorPageProps {
     status: ErrorStatus;
     owner: { name: string };
 }
+
+/** Mirrors App\Queries\ColophonQuery::get(). Byte counts are numbers of bytes. */
+export interface Colophon {
+    stack: { name: string; version: string }[];
+    weight: { js: number; css: number; fonts: number; fonts_amharic: number } | null;
+    build: { commit: string | null; commit_url: string | null; built_at: string } | null;
+    quality: {
+        tests: { passed: number; total: number } | null;
+        lighthouse: { pages: number; performance: number; accessibility: number; best_practices: number; seo: number } | null;
+        measured_at: string;
+    } | null;
+    repository_url: string | null;
+}
+
+export interface ColophonPageProps {
+    colophon: Colophon;
+    owner: Owner;
+}

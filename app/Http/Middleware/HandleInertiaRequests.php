@@ -37,6 +37,7 @@ final class HandleInertiaRequests extends Middleware
             'urls' => fn (): array => [
                 'home' => LocalizedUrls::route('home'),
                 'contact' => LocalizedUrls::route('contact.store'),
+                'colophon' => LocalizedUrls::route('colophon'),
             ],
             // Sent once per visit; switching language is a full page load.
             'translations' => Inertia::once(fn (): array => Translations::for(Locale::current())),

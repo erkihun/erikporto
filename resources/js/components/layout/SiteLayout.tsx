@@ -157,6 +157,9 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
                                 {t('footer.now')}
                             </Link>
                         ) : null}
+                        <Link href={urls.colophon} prefetch style={{ textDecoration: 'none' }}>
+                            {t('footer.colophon')}
+                        </Link>
                         {hasNotes ? (
                             <a href="/feed.xml" style={{ textDecoration: 'none' }}>
                                 {t('footer.rss')}

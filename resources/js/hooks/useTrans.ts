@@ -15,7 +15,9 @@ export function useTrans(): Translate {
     return useCallback<Translate>(
         (key, replacements) => {
             let text = translations[key] ?? key;
-            for (const [name, value] of Object.entries(replacements ?? {})) {
+            // Longest names first (as Laravel does), so :fonts never eats the start of :fonts_am.
+            const entries = Object.entries(replacements ?? {}).sort(([a], [b]) => b.length - a.length);
+            for (const [name, value] of entries) {
                 text = text.replaceAll(`:${name}`, String(value));
             }
             return text;

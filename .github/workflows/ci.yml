@@ -26,7 +26,14 @@ jobs:
         run: npm run budgets
       - run: cp .env.example .env && php artisan key:generate
       - run: vendor/bin/pint --test
-      - run: php artisan test
+      - run: php artisan test --log-junit junit.xml
+      - name: Keep the test report (the colophon's test count)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit
+          path: junit.xml
+          retention-days: 30
 
   # Production runs MySQL 8: JSON columns, the translatable migration and its rollback.
   mysql:
@@ -102,3 +109,33 @@ jobs:
           name: lighthouse-reports
           path: .lighthouseci/
           retention-days: 30
+
+  # The numbers the colophon shows: test count and Lighthouse scores of this green run,
+  # published as the quality.json asset of the "quality" release (no commits to main).
+  # deploy/deploy.sh downloads it into storage/app/quality.json.
+  quality:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [test, mysql, lighthouse]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: junit
+          path: ci/junit
+      - uses: actions/download-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: ci/lighthouse
+      - run: node scripts/quality-report.mjs --junit ci/junit/junit.xml --lighthouse ci/lighthouse/reports --out quality.json
+      - name: Publish quality.json
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view quality >/dev/null 2>&1 || gh release create quality --title "Quality report" --notes "Latest CI numbers for the colophon, replaced on every green push to main." --latest=false
+          gh release upload quality quality.json --clobber

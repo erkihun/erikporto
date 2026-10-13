@@ -23,6 +23,7 @@ final class SitemapController extends Controller
                 // Pages in every language, each listed once per locale with hreflang alternates.
                 'localized' => [
                     $this->localized('home'),
+                    $this->localized('colophon'),
                     ...$projects->map(fn (Project $project): array => $this->localized('projects.show', $project, $project->updated_at)),
                 ],
                 'notes' => Note::query()->published()->latestFirst()->get(['slug', 'updated_at']),

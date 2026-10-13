@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\ColophonController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\CvDownloadController;
 use App\Http\Controllers\FallbackController;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 $localized = static function (): void {
     Route::get('/', HomeController::class)->name('home');
     Route::get('/work/{project}', [ProjectController::class, 'show'])->name('projects.show');
+    Route::get('/colophon', ColophonController::class)->name('colophon');
     Route::post('/contact', [ContactMessageController::class, 'store'])
         ->middleware('throttle:contact')
         ->name('contact.store');

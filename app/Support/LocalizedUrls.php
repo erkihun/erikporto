@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 final class LocalizedUrls
 {
     /** Named GET routes registered once per locale. */
-    public const PAGES = ['home', 'projects.show'];
+    public const PAGES = ['home', 'projects.show', 'colophon'];
 
     public static function route(string $name, mixed $parameters = [], ?Locale $locale = null, bool $absolute = false): string
     {
