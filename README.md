@@ -1,0 +1,62 @@
+# Erkihun Bewket — Portfolio
+
+Laravel 12 · Inertia 2 (React 19 + TypeScript, SSR) · Tailwind 4 · Filament 4 admin · Pest.
+
+All public content lives in the database and is edited at **/admin**: profile, projects, capabilities, process, experience and education. Only the section headings are hard-coded.
+
+## Setup
+
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+# set PORTFOLIO_ADMIN_EMAIL and PORTFOLIO_ADMIN_PASSWORD in .env
+touch database/database.sqlite   # or configure MySQL in .env
+php artisan migrate --seed       # creates the admin user and the initial content
+php artisan storage:link
+npm run build                    # type-check, client bundle, SSR bundle
+```
+
+Local development:
+
+```bash
+php artisan serve
+npm run dev
+php artisan queue:work           # sends contact-form notification emails
+```
+
+Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
+
+## Architecture
+
+| Concern | Where |
+| --- | --- |
+| Routes | `routes/web.php`: `/`, `/work/{slug}`, `POST /contact`, `/cv`, `/sitemap.xml` |
+| Page data | `app/Queries/HomePageQuery.php` and `ProjectController`, both cached |
+| API contracts | `app/Http/Resources/*` ⇄ `resources/js/types/portfolio.ts` |
+| Contact workflow | `StoreContactMessageRequest` → `SubmitContactMessage` action → queued `NewContactMessage` notification |
+| Admin | `app/Filament/Resources/*`, open only to users with `is_admin = true` |
+| Cache | `App\Support\PortfolioCache`: versioned keys, flushed when any content model is saved or deleted and after drag-reordering |
+| Frontend | `resources/js/pages` (Inertia pages), `components/home` (sections), `components/home/OrgGraph.tsx` (hero motion canvas) |
+| Ethiopian calendar | `resources/js/lib/ethiopian-calendar.ts` |
+
+### Security
+- Contact form: FormRequest validation, a honeypot field (bots receive a fake success), and per-IP rate limits (3 per minute and 10 per day by default). `ip_address` and `read_at` can never be mass-assigned.
+- The CV is stored on the private `local` disk and served only through `/cv`.
+- The admin panel requires `is_admin`. That flag isn't fillable; only the seeder sets it.
+- `Model::shouldBeStrict()` is on outside production, and HTTPS is forced in production.
+
+## Production checklist
+- `APP_ENV=production`, `APP_DEBUG=false` and the real `APP_URL`
+- MySQL configured in `.env` (the migrations work on both SQLite and MySQL)
+- A mail driver, plus a queue worker under Supervisor
+- `php artisan inertia:start-ssr` under Supervisor
+- `php artisan optimize` and `php artisan filament:optimize` on each deploy
+- Real screenshots uploaded in **Admin → Projects → Media** to replace the illustrated placeholders
+
+## Tests
+
+```bash
+php artisan test
+```
