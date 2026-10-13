@@ -26,7 +26,7 @@ it('forbids authenticated users who are not admins', function (): void {
 });
 
 it('lets admins open every content screen', function (string $uri): void {
-    $this->actingAs(User::factory()->admin()->create())->get($uri)->assertOk();
+    $this->actingAs(User::factory()->admin()->withMfa()->create())->get($uri)->assertOk();
 })->with([
     '/admin',
     '/admin/projects',
@@ -40,13 +40,13 @@ it('lets admins open every content screen', function (string $uri): void {
 it('opens the profile editor directly', function (): void {
     $profile = Profile::factory()->create();
 
-    $this->actingAs(User::factory()->admin()->create())
+    $this->actingAs(User::factory()->admin()->withMfa()->create())
         ->get('/admin/profiles')
         ->assertRedirect("/admin/profiles/{$profile->id}/edit");
 });
 
 it('creates a project from the admin form with English and Amharic copy', function (): void {
-    $this->actingAs(User::factory()->admin()->create());
+    $this->actingAs(User::factory()->admin()->withMfa()->create());
 
     Livewire::test(CreateProject::class)
         ->fillForm([
@@ -73,7 +73,7 @@ it('creates a project from the admin form with English and Amharic copy', functi
 });
 
 it('fills the slug from the English title', function (): void {
-    $this->actingAs(User::factory()->admin()->create());
+    $this->actingAs(User::factory()->admin()->withMfa()->create());
 
     Livewire::test(CreateProject::class)
         ->fillForm(['title.en' => 'Recruitment Portal'])
@@ -81,7 +81,7 @@ it('fills the slug from the English title', function (): void {
 });
 
 it('requires the English copy but not the Amharic', function (): void {
-    $this->actingAs(User::factory()->admin()->create());
+    $this->actingAs(User::factory()->admin()->withMfa()->create());
 
     Livewire::test(CreateProject::class)
         ->fillForm(['title.am' => 'ፕሮጀክት', 'slug' => 'x', 'category' => 'software', 'stack' => ['PHP']])
@@ -92,7 +92,7 @@ it('requires the English copy but not the Amharic', function (): void {
 
 it('loads both languages into the project edit form', function (): void {
     $project = Project::factory()->create(['title' => ['en' => 'EUISIS', 'am' => 'ኢዩሲስ']]);
-    $this->actingAs(User::factory()->admin()->create());
+    $this->actingAs(User::factory()->admin()->withMfa()->create());
 
     Livewire::test(EditProject::class, ['record' => $project->getRouteKey()])
         ->assertSchemaStateSet(['title.en' => 'EUISIS', 'title.am' => 'ኢዩሲስ']);
@@ -100,7 +100,7 @@ it('loads both languages into the project edit form', function (): void {
 
 it('saves the profile in both languages from the admin form', function (): void {
     $profile = Profile::factory()->create(['headline' => 'Developer', 'bio' => ['First paragraph.']]);
-    $this->actingAs(User::factory()->admin()->create());
+    $this->actingAs(User::factory()->admin()->withMfa()->create());
 
     Livewire::test(EditProfile::class, ['record' => $profile->getRouteKey()])
         ->assertSchemaStateSet(['headline.en' => 'Developer'])
@@ -120,7 +120,7 @@ it('saves the profile in both languages from the admin form', function (): void 
 
 it('rejects a duplicate slug', function (): void {
     Project::factory()->create(['slug' => 'taken']);
-    $this->actingAs(User::factory()->admin()->create());
+    $this->actingAs(User::factory()->admin()->withMfa()->create());
 
     Livewire::test(CreateProject::class)
         ->fillForm(['title.en' => 'X', 'slug' => 'taken', 'category' => 'software', 'summary.en' => 's', 'problem.en' => 'p', 'role.en' => 'r', 'solution.en' => 's', 'outcome.en' => 'o', 'stack' => ['PHP']])
@@ -130,7 +130,7 @@ it('rejects a duplicate slug', function (): void {
 
 it('marks a message as read when an admin opens it', function (): void {
     $message = ContactMessage::factory()->create();
-    $this->actingAs(User::factory()->admin()->create());
+    $this->actingAs(User::factory()->admin()->withMfa()->create());
 
     Livewire::test(ViewContactMessage::class, ['record' => $message->getRouteKey()])->assertOk();
 
@@ -138,7 +138,7 @@ it('marks a message as read when an admin opens it', function (): void {
 });
 
 it('creates a scheduled note from the admin form', function (): void {
-    $this->actingAs(User::factory()->admin()->create());
+    $this->actingAs(User::factory()->admin()->withMfa()->create());
 
     Livewire::test(CreateNote::class)
         ->fillForm([
@@ -157,7 +157,7 @@ it('creates a scheduled note from the admin form', function (): void {
 });
 
 it('lets admins open the notes screens', function (): void {
-    $this->actingAs(User::factory()->admin()->create());
+    $this->actingAs(User::factory()->admin()->withMfa()->create());
 
     $this->get('/admin/notes')->assertOk();
     $this->get('/admin/notes/create')->assertOk();
@@ -165,7 +165,7 @@ it('lets admins open the notes screens', function (): void {
 });
 
 it('creates a scheduled now update from the admin form', function (): void {
-    $this->actingAs(User::factory()->admin()->create());
+    $this->actingAs(User::factory()->admin()->withMfa()->create());
 
     Livewire::test(CreateNowUpdate::class)
         ->fillForm([
@@ -181,7 +181,7 @@ it('creates a scheduled now update from the admin form', function (): void {
 });
 
 it('lets admins open the now screens', function (): void {
-    $this->actingAs(User::factory()->admin()->create());
+    $this->actingAs(User::factory()->admin()->withMfa()->create());
 
     $this->get('/admin/now-updates')->assertOk();
     $this->get('/admin/now-updates/create')->assertOk();

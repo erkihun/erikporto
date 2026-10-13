@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -29,6 +30,17 @@ final class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            // Profile page: password change and the authenticator-app / recovery-code management.
+            ->profile(isSimple: false)
+            // Every admin must set up an authenticator app before using the panel (first login
+            // redirects to /admin/multi-factor-authentication/set-up). Login itself is limited to
+            // 5 attempts per minute per IP by Filament, and code entry is rate-limited per user.
+            ->multiFactorAuthentication([
+                AppAuthentication::make()
+                    ->brandName(config('app.name'))
+                    ->recoverable()
+                    ->regenerableRecoveryCodes(),
+            ], isRequired: true)
             ->brandName('Erkihun · Admin')
             ->colors([
                 'primary' => Color::hex('#2747F5'),

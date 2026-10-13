@@ -70,7 +70,7 @@ npm run perf                  # Lighthouse CI (lighthouserc.cjs) against scripts
 | Home page data | `app/Queries/HomePageQuery.php` |
 | Contact workflow | `StoreContactMessageRequest` → `App\Actions\SubmitContactMessage` → queued `NewContactMessage` |
 | Seeders | `AdminUserSeeder` always; `DemoContentSeeder` only in local and tests. Production starts empty and `/` renders `ComingSoon` until a profile exists |
-| Admin access | `User::canAccessPanel()` requires `is_admin` |
+| Admin access | `User::canAccessPanel()` requires `is_admin`; the panel also requires app MFA (Filament `AppAuthentication`, recoverable). Tests that open admin pages over HTTP use `User::factory()->admin()->withMfa()` |
 | Ethiopian calendar | `resources/js/lib/ethiopian-calendar.ts` |
 | Notes | `Note` model: draft/scheduled/published is derived from `published_at` (never stored). `body_html`, `toc`, `reading_minutes` are derived on save and are not fillable |
 | Markdown safety | `MarkdownRenderer`: `html_input=escape`, `allow_unsafe_links=false`. Never render user Markdown any other way |

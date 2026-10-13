@@ -6,16 +6,24 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Filament\Auth\MultiFactor\App\Concerns\InteractsWithAppAuthentication;
+use Filament\Auth\MultiFactor\App\Concerns\InteractsWithAppAuthenticationRecovery;
+use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
+use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements FilamentUser
+/**
+ * Admin accounts. Multi-factor authentication (authenticator app + recovery codes) is
+ * required by the admin panel; the secret and codes are stored encrypted and hidden.
+ */
+class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, InteractsWithAppAuthentication, InteractsWithAppAuthenticationRecovery, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -31,6 +39,9 @@ class User extends Authenticatable implements FilamentUser
     /** @var array<string, mixed> */
     protected $attributes = [
         'is_admin' => false,
+        // No authenticator app until the admin sets one up (strict mode needs the defaults).
+        'app_authentication_secret' => null,
+        'app_authentication_recovery_codes' => null,
     ];
 
     /**
