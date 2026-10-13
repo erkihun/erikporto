@@ -10,9 +10,11 @@ final class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call([
-            AdminUserSeeder::class,
-            PortfolioContentSeeder::class,
-        ]);
+        $this->call(AdminUserSeeder::class);
+
+        // Production starts empty: real content is entered in /admin.
+        if (app()->isLocal() || app()->runningUnitTests()) {
+            $this->call(DemoContentSeeder::class);
+        }
     }
 }

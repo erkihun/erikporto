@@ -14,7 +14,10 @@ final class HomeController extends Controller
     {
         $props = $query->get();
 
-        abort_if($props === null, 503, 'The portfolio profile has not been set up yet.');
+        // A fresh production install has no profile until the owner fills it in /admin.
+        if ($props === null) {
+            return Inertia::render('ComingSoon');
+        }
 
         return Inertia::render('Home', $props);
     }

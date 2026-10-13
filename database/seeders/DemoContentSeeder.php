@@ -16,10 +16,11 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Initial content. Idempotent: rows are matched on natural keys, so it is
- * safe to re-run. After launch, edit everything from /admin instead.
+ * Demo content for local development and tests. Never runs in production,
+ * where the site starts empty and content is entered in /admin (see
+ * DatabaseSeeder). Idempotent: rows are matched on natural keys.
  */
-final class PortfolioContentSeeder extends Seeder
+final class DemoContentSeeder extends Seeder
 {
     public function run(): void
     {

@@ -19,10 +19,12 @@ interface SiteLayoutProps {
     ownerName: string;
     /** On the home page section links are in-page anchors; elsewhere they point back home. */
     isHome?: boolean;
+    /** Hide the section links and "Hire me" on pages where those sections don't exist (coming soon). */
+    sections?: boolean;
     children: ReactNode;
 }
 
-export function SiteLayout({ ownerName, isHome = false, children }: SiteLayoutProps) {
+export function SiteLayout({ ownerName, isHome = false, sections = true, children }: SiteLayoutProps) {
     const { flash } = usePage().props;
     const { toggle } = useTheme();
     const [scrolled, setScrolled] = useState(false);
@@ -83,19 +85,23 @@ export function SiteLayout({ ownerName, isHome = false, children }: SiteLayoutPr
                         <Monogram />
                         <span>{firstName}</span>
                     </Link>
-                    <nav className="nav-links" aria-label="Sections">
-                        {SECTIONS.map(([id, label]) => (
-                            <a key={id} href={href(id)} className={active === id ? 'active' : undefined}>
-                                {label}
-                            </a>
-                        ))}
-                    </nav>
-                    <button className="icon-btn" type="button" onClick={toggle} aria-label="Toggle colour theme">
+                    {sections ? (
+                        <nav className="nav-links" aria-label="Sections">
+                            {SECTIONS.map(([id, label]) => (
+                                <a key={id} href={href(id)} className={active === id ? 'active' : undefined}>
+                                    {label}
+                                </a>
+                            ))}
+                        </nav>
+                    ) : null}
+                    <button className="icon-btn" type="button" onClick={toggle} aria-label="Toggle colour theme" style={sections ? undefined : { marginLeft: 'auto' }}>
                         <Sun />
                     </button>
-                    <a className="btn btn-primary btn-sm" href={href('contact')}>
-                        Hire me
-                    </a>
+                    {sections ? (
+                        <a className="btn btn-primary btn-sm" href={href('contact')}>
+                            Hire me
+                        </a>
+                    ) : null}
                 </div>
             </header>
 

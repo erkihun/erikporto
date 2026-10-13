@@ -33,5 +33,7 @@
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="INERTIA_SSR_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- Keep the developer's .env out of assertions about notification routing. -->
+        <env name="PORTFOLIO_NOTIFY_EMAIL" value=""/>
     </php>
 </phpunit>

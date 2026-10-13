@@ -10,8 +10,10 @@ use App\Models\Project;
 use App\Models\SkillGroup;
 use Inertia\Testing\AssertableInertia as Assert;
 
-it('returns 503 until a profile is configured', function (): void {
-    $this->get('/')->assertStatus(503);
+it('shows the coming-soon page until a profile is configured', function (): void {
+    $this->get('/')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('ComingSoon'));
 });
 
 it('renders the home page from database content', function (): void {

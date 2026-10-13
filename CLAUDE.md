@@ -49,5 +49,6 @@ npm run build                 # tsc + client bundle + SSR bundle
 | Routes | `routes/web.php` |
 | Home page data | `app/Queries/HomePageQuery.php` |
 | Contact workflow | `StoreContactMessageRequest` → `App\Actions\SubmitContactMessage` → queued `NewContactMessage` |
+| Seeders | `AdminUserSeeder` always; `DemoContentSeeder` only in local and tests. Production starts empty and `/` renders `ComingSoon` until a profile exists |
 | Admin access | `User::canAccessPanel()` requires `is_admin` |
 | Ethiopian calendar | `resources/js/lib/ethiopian-calendar.ts` |

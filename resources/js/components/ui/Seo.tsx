@@ -5,10 +5,12 @@ interface SeoProps {
     description: string;
     image?: string | null;
     type?: 'website' | 'article';
+    /** Keep placeholder pages (coming soon) out of search indexes. */
+    noindex?: boolean;
 }
 
 /** Rendered server-side through Inertia SSR, so crawlers and link previews see it. */
-export function Seo({ title, description, image, type = 'website' }: SeoProps) {
+export function Seo({ title, description, image, type = 'website', noindex = false }: SeoProps) {
     const page = usePage();
     const { app } = page.props;
     const url = `${app.url.replace(/\/$/, '')}${page.url}`;
@@ -23,6 +25,7 @@ export function Seo({ title, description, image, type = 'website' }: SeoProps) {
             <meta head-key="og:url" property="og:url" content={url} />
             {image ? <meta head-key="og:image" property="og:image" content={image} /> : null}
             <meta head-key="twitter:card" name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+            {noindex ? <meta head-key="robots" name="robots" content="noindex" /> : null}
         </Head>
     );
 }

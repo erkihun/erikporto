@@ -13,7 +13,7 @@ cp .env.example .env
 php artisan key:generate
 # set PORTFOLIO_ADMIN_EMAIL and PORTFOLIO_ADMIN_PASSWORD in .env
 touch database/database.sqlite   # or configure MySQL in .env
-php artisan migrate --seed       # creates the admin user and the initial content
+php artisan migrate --seed       # admin user always; demo content only when APP_ENV=local
 php artisan storage:link
 npm run build                    # type-check, client bundle, SSR bundle
 ```
@@ -48,6 +48,7 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 - `Model::shouldBeStrict()` is on outside production, and HTTPS is forced in production.
 
 ## Production checklist
+- Production seeds only the admin user (`php artisan db:seed --force`). The home page shows a "coming soon" page until the profile is filled in at /admin.
 - `APP_ENV=production`, `APP_DEBUG=false` and the real `APP_URL`
 - MySQL configured in `.env` (the migrations work on both SQLite and MySQL)
 - A mail driver, plus a queue worker under Supervisor
