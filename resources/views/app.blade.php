@@ -10,12 +10,17 @@
             try { var t = localStorage.getItem('eb-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
             document.documentElement.classList.add('js');
         </script>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Ethiopic:wght@400;600&display=swap">
+        {{-- Self-hosted fonts (resources/css/fonts.css). The display face sets the hero name, the LCP element. --}}
+        <link rel="preload" href="{{ Vite::asset('resources/fonts/archivo-latin-critical.woff2') }}" as="font" type="font/woff2" crossorigin>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="alternate" type="application/xml" href="{{ route('sitemap') }}">
-        @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+        @if (Vite::isRunningHot())
+            @vite('resources/css/app.css')
+        @else
+            {{-- The whole stylesheet is ~8 KB gzip: inlining it removes the only render-blocking request. --}}
+            <style>{!! Vite::content('resources/css/app.css') !!}</style>
+        @endif
+        @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         @inertiaHead
     </head>
     <body>

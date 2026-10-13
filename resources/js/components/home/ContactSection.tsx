@@ -50,7 +50,7 @@ export function ContactSection({ profile, inquiryTypes }: { profile: Profile; in
         <section className="block wrap" id="contact">
             <div className="contact rv">
                 <div>
-                    <span className="kicker mono" style={{ color: 'var(--accent)' }}>Contact</span>
+                    <span className="kicker mono" style={{ color: 'var(--paper)' }}>Contact</span>
                     <h2>Let’s build something that lasts.</h2>
                     <p className="sub">Tell me about the system or the brand you need. I usually reply within two working days.</p>
                     <div className="chan">
@@ -71,7 +71,7 @@ export function ContactSection({ profile, inquiryTypes }: { profile: Profile; in
 
                 {sent ? (
                     <div className="sent" role="status">
-                        <span className="kicker mono">Sent</span>
+                        <span className="kicker mono" style={{ color: 'var(--paper)' }}>Sent</span>
                         <h3 style={{ fontSize: 32, fontStretch: '85%' }}>Thank you.</h3>
                         <p style={{ opacity: 0.75, marginTop: 10 }}>Your message is on its way. I’ll reply within two working days.</p>
                     </div>

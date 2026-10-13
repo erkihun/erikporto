@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { useRef, type PointerEvent } from 'react';
 
+import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
 import type { ProjectSummary } from '@/types/portfolio';
 
 import { ArrowUpRight } from '../ui/icons';
@@ -8,6 +9,7 @@ import { ProjectVisual } from './ProjectMock';
 
 export function ProjectCard({ project, hidden }: { project: ProjectSummary; hidden: boolean }) {
     const ref = useRef<HTMLAnchorElement>(null);
+    const prefetchOnFocus = usePrefetchOnFocus(project.url);
 
     const onMove = (e: PointerEvent<HTMLAnchorElement>) => {
         const el = ref.current;
@@ -26,10 +28,11 @@ export function ProjectCard({ project, hidden }: { project: ProjectSummary; hidd
         <Link
             ref={ref}
             href={project.url}
+            prefetch
+            onFocus={prefetchOnFocus}
             className={`card rv ${hidden ? 'hide' : ''}`}
             onPointerMove={onMove}
             onPointerLeave={onLeave}
-            aria-label={`Case study: ${project.title}`}
         >
             <span className="shot">
                 <ProjectVisual coverUrl={project.cover_url} mock={project.mock} alt={`${project.title} screenshot`} />

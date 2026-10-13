@@ -5,10 +5,13 @@ import { SiteLayout } from '@/components/layout/SiteLayout';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from '@/components/ui/icons';
 import { Placeholder } from '@/components/ui/Placeholder';
 import { Seo } from '@/components/ui/Seo';
+import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
 import type { ProjectPageProps } from '@/types/portfolio';
 
 export default function ProjectShow({ project, position, next, owner }: ProjectPageProps) {
     const isDesign = project.category === 'design';
+    const prefetchHome = usePrefetchOnFocus('/');
+    const prefetchNext = usePrefetchOnFocus(next?.url ?? '/');
     const sections: [string, string][] = [
         ['Problem', project.problem],
         ['My role', project.role],
@@ -22,7 +25,7 @@ export default function ProjectShow({ project, position, next, owner }: ProjectP
 
             <article className="wrap page-enter">
                 <header className="cs-hero">
-                    <Link className="back mono" href="/#work">
+                    <Link className="back mono" href="/#work" prefetch onFocus={prefetchHome}>
                         <ArrowLeft width={14} height={14} /> All work
                     </Link>
                     <span className="kicker mono">
@@ -108,7 +111,7 @@ export default function ProjectShow({ project, position, next, owner }: ProjectP
                 </div>
 
                 {next ? (
-                    <Link className="next rv" href={next.url} style={{ marginBottom: 'clamp(48px,8vw,96px)' }}>
+                    <Link className="next rv" href={next.url} prefetch onFocus={prefetchNext} style={{ marginBottom: 'clamp(48px,8vw,96px)' }}>
                         <div>
                             <span className="kicker mono">Next case study</span>
                             <h2>{next.title}</h2>

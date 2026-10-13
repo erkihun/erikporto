@@ -14,7 +14,7 @@ export function Process({ steps }: { steps: ProcessStep[] }) {
                 {steps.map((s, i) => (
                     <li className="step rv" key={s.id}>
                         <span className="num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                        <h4>{s.title}</h4>
+                        <h3>{s.title}</h3>
                         <p>{s.description}</p>
                     </li>
                 ))}

@@ -40,6 +40,7 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 | Cache | `App\Support\PortfolioCache`: versioned keys, flushed when any content model is saved or deleted and after drag-reordering |
 | Frontend | `resources/js/pages` (Inertia pages), `components/home` (sections), `components/home/OrgGraph.tsx` + `lib/org-graph-engine.ts` (hero motion canvas, loaded when idle) |
 | React API | Preact via preact/compat: aliases in `vite.config.ts`, compat module `resources/js/lib/preact-react.js`. `npm run analyze` shows the bundle treemap |
+| Fonts | Self-hosted subset woff2 in `resources/fonts`, generated with `@font-face` rules into `resources/css/fonts.css` by `npm run fonts` (`scripts/fonts.mjs`). First view loads only the critical Latin and Ethiopic-core files. OFL licences in `resources/fonts/licenses` |
 | Ethiopian calendar | `resources/js/lib/ethiopian-calendar.ts` |
 
 ### Security

@@ -18,7 +18,9 @@ function HeadlineParts({ headline }: { headline: string }) {
 }
 
 export function Hero({ profile }: { profile: Profile }) {
-    let i = 0;
+    // Each word is one text run so the name is a single large paint (the LCP element);
+    // the stagger offset keeps the rhythm of the former per-letter animation.
+    let offset = 0;
 
     return (
         <section className="hero wrap">
@@ -29,16 +31,19 @@ export function Hero({ profile }: { profile: Profile }) {
                         <span>{profile.is_available ? 'Available for projects' : 'Currently booked'}</span>
                         {profile.location ? <span>· {profile.location}</span> : null}
                     </span>
-                    <h1 className="name" aria-label={profile.name}>
-                        {profile.name.split(' ').map((word) => (
-                            <span className="w" key={word} aria-hidden="true">
-                                {[...word].map((ch) => (
-                                    <span className="ch" key={i} style={{ ['--i' as string]: i++ }}>
-                                        {ch}
-                                    </span>
-                                ))}
-                            </span>
-                        ))}
+                    <h1 className="name">
+                        {profile.name.split(' ').map((word, index) => {
+                            const delay = offset;
+                            offset += [...word].length;
+
+                            return (
+                                <span className="w" key={`${index}-${word}`}>
+                                    <span className="ch" style={{ ['--i' as string]: delay }}>
+                                        {word}
+                                    </span>{' '}
+                                </span>
+                            );
+                        })}
                     </h1>
                     <div className="role">
                         <HeadlineParts headline={profile.headline} />

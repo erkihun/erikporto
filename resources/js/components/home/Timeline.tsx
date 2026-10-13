@@ -15,7 +15,7 @@ export function Timeline({ items }: { items: Experience[] }) {
                     <div className="tl rv" key={x.id}>
                         <span className="mono when">{x.type_label}</span>
                         <div>
-                            <h4>{x.title}</h4>
+                            <h3>{x.title}</h3>
                             <p>
                                 {x.organization}
                                 {x.location ? `, ${x.location}` : ''}
