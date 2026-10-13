@@ -28,7 +28,7 @@ interface SiteLayoutProps {
 }
 
 export function SiteLayout({ ownerName, isHome = false, sections = true, children }: SiteLayoutProps) {
-    const { flash, hasNotes, hasNow, locale, locales, urls } = usePage().props;
+    const { flash, hasNotes, hasNow, homeSections, locale, locales, urls } = usePage().props;
     const t = useTrans();
     const { toggle } = useTheme();
     const prefetchHome = usePrefetchOnFocus(urls.home);
@@ -40,6 +40,7 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
     const [today, setToday] = useState<{ greg: string; eth: string } | null>(null);
     const firstName = ownerName.split(' ')[0] ?? ownerName;
     const href = (id: string) => (isHome ? `#${id}` : `${urls.home}#${id}`);
+    const links = SECTIONS.filter(([id]) => homeSections.includes(id));
 
     useEffect(() => setToast(flash.success), [flash.success]);
     const clearToast = useCallback(() => setToast(null), []);
@@ -95,7 +96,7 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
                     </Link>
                     {sections ? (
                         <nav className="nav-links" aria-label={t('nav.sections')}>
-                            {SECTIONS.map(([id, label]) => (
+                            {links.map(([id, label]) => (
                                 <a key={id} href={href(id)} className={active === id ? 'active' : undefined}>
                                     {t(label)}
                                 </a>

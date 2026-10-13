@@ -29,6 +29,23 @@ final readonly class HomePageQuery
 {
     public function __construct(private Request $request) {}
 
+    /**
+     * Anchors of the home sections that render, in page order, for the navigation:
+     * sections without content are left out instead of showing empty, so their links go too.
+     *
+     * @return list<string>
+     */
+    public static function sections(): array
+    {
+        return array_keys(array_filter([
+            'work' => true, // shows an "in preparation" state until the first case study is published
+            'capabilities' => SkillGroup::query()->exists(),
+            'experience' => Experience::query()->exists(),
+            'about' => true,
+            'contact' => true,
+        ]));
+    }
+
     /** @return array<string, mixed>|null null when no profile has been configured */
     public function get(): ?array
     {

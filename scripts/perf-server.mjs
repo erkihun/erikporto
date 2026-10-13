@@ -1,7 +1,8 @@
 /**
  * Starts a production-like copy of the site for Lighthouse CI (lighthouserc.cjs runs it).
  *
- * - Fresh SQLite database seeded with LighthouseSeeder (demo content + a note + a /now update).
+ * - Fresh SQLite database seeded with LighthouseSeeder (demo content + a note + a /now update),
+ *   or the seeder named in PERF_SEEDER.
  * - Config, route and view caches written to an isolated directory (APP_*_CACHE, relative to the
  *   project because Laravel treats only paths starting with / or \ as absolute), so the
  *   developer's bootstrap/cache and .env are never touched.
@@ -69,7 +70,8 @@ const artisan = (...args) => {
 // Clear first: a stale cached config would ignore the environment above.
 artisan('config:clear');
 artisan('route:clear');
-artisan('migrate:fresh', '--seed', '--seeder=Database\\Seeders\\LighthouseSeeder', '--force');
+// PERF_SEEDER picks another dataset, e.g. ProfileOnlySeeder for the empty states.
+artisan('migrate:fresh', '--seed', `--seeder=Database\\Seeders\\${process.env.PERF_SEEDER ?? 'LighthouseSeeder'}`, '--force');
 artisan('config:cache');
 artisan('route:cache');
 artisan('view:cache');

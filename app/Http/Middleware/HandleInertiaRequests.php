@@ -7,6 +7,7 @@ namespace App\Http\Middleware;
 use App\Enums\Locale;
 use App\Models\Note;
 use App\Models\NowUpdate;
+use App\Queries\HomePageQuery;
 use App\Support\LocalizedUrls;
 use App\Support\PortfolioCache;
 use App\Support\Translations;
@@ -49,6 +50,8 @@ final class HandleInertiaRequests extends Middleware
                 'nav:has-now',
                 static fn (): string => NowUpdate::query()->published()->exists() ? 'yes' : 'no',
             ) === 'yes',
+            // Home sections that have content (nav links to empty ones are hidden).
+            'homeSections' => fn (): array => PortfolioCache::remember('nav:home-sections', static fn (): array => HomePageQuery::sections()),
             'flash' => [
                 'success' => fn (): ?string => $request->hasSession() ? $request->session()->get('success') : null,
             ],
