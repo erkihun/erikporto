@@ -6,7 +6,7 @@
         <meta name="theme-color" content="#F3F5F4" media="(prefers-color-scheme: light)">
         <meta name="theme-color" content="#0B0F0F" media="(prefers-color-scheme: dark)">
         {{-- Apply the saved theme before first paint to avoid a flash. --}}
-        <script>
+        <script nonce="{{ Vite::cspNonce() }}">
             try { var t = localStorage.getItem('eb-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
             document.documentElement.classList.add('js');
         </script>
@@ -20,7 +20,7 @@
             @vite('resources/css/app.css')
         @else
             {{-- The whole stylesheet is ~8 KB gzip: inlining it removes the only render-blocking request. --}}
-            <style>{!! Vite::content('resources/css/app.css') !!}</style>
+            <style nonce="{{ Vite::cspNonce() }}">{!! Vite::content('resources/css/app.css') !!}</style>
         @endif
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         @inertiaHead

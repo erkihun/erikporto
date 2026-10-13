@@ -74,3 +74,31 @@ test('printing leaves out the interface', async ({ page }) => {
     await expect(page.locator('h1')).toBeVisible();
     await expect(page.locator('.cs-block').first()).toBeVisible();
 });
+
+test('the Content Security Policy blocks nothing the site itself does', async ({ page, isMobile }) => {
+    await page.addInitScript(() => {
+        const found: string[] = [];
+        (window as unknown as { __csp: string[] }).__csp = found;
+        document.addEventListener('securitypolicyviolation', (event) => found.push(`${event.violatedDirective} ${event.blockedURI}`));
+    });
+    const violationsSoFar = () => page.evaluate(() => (window as unknown as { __csp: string[] }).__csp);
+
+    await open(page, '/');
+    expect(await page.evaluate(() => document.querySelector('meta[http-equiv]'))).toBeNull();
+    if (!isMobile) {
+        await page.keyboard.press('Control+k');
+        await expect(page.getByRole('dialog').getByRole('option').first()).toBeVisible();
+        await page.keyboard.press('Escape');
+    }
+    await page.locator('.work .card').first().click();
+    await expect(page).toHaveURL(/\/work\//);
+    expect(await violationsSoFar()).toEqual([]);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/$/);
+    expect(await violationsSoFar()).toEqual([]);
+
+    for (const path of ['/am', '/notes/storing-ethiopian-dates', '/now', '/colophon', '/no-such-page']) {
+        await open(page, path);
+        expect(await violationsSoFar(), path).toEqual([]);
+    }
+});

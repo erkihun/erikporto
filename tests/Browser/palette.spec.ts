@@ -37,6 +37,8 @@ test.describe('command palette', () => {
         await trigger.click();
 
         const options = page.getByRole('dialog').getByRole('option');
+        // Wait for the case studies, so the list no longer grows under the arrow keys.
+        await expect(page.getByRole('dialog').getByRole('option', { name: /EUISIS/ })).toBeVisible();
         await expect(options.first()).toHaveAttribute('aria-selected', 'true');
         await page.keyboard.press('ArrowDown');
         await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true');

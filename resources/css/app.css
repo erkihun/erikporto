@@ -411,3 +411,7 @@ html[data-vt]::view-transition-new(root){animation:vt-in .3s var(--ease) both}
   .wrap{max-width:none}
   @page{margin:16mm}
 }
+
+/* Navigation progress (lib/navigation-progress.ts) */
+html.is-navigating::after{content:"";position:fixed;top:0;left:0;right:0;height:2px;z-index:90;pointer-events:none;background:linear-gradient(90deg,transparent,var(--accent),transparent) no-repeat;background-size:40% 100%;animation:nav-progress 1s var(--ease) infinite}
+@keyframes nav-progress{from{background-position:-40% 0}to{background-position:140% 0}}

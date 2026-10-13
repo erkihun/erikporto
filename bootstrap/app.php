@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocale;
 use App\Http\Responses\ErrorPage;
 use Illuminate\Foundation\Application;
@@ -18,11 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
+            SecurityHeaders::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        $middleware->alias(['locale' => SetLocale::class]);
+        $middleware->alias(['locale' => SetLocale::class, 'security' => SecurityHeaders::class]);
         // Before throttling and route-model binding, so rate-limit messages and the
         // 404 for an unknown slug are already in the visitor's language.
         $middleware->prependToPriorityList(before: [ThrottleRequests::class, SubstituteBindings::class], prepend: SetLocale::class);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\SecurityHeaders;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -67,6 +68,8 @@ final class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                // Baseline headers; no CSP, Livewire and Alpine need inline scripts.
+                SecurityHeaders::class.':admin',
             ])
             ->authMiddleware([
                 Authenticate::class,
