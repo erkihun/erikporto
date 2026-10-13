@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Portfolio of Erkihun Bewket. Laravel 12 · PHP 8.3 · Inertia v2 + React 19 + TypeScript (SSR) · Tailwind 4 · Filament 4 admin at `/admin` · Pest 3.
+Portfolio of Erkihun Bewket. Laravel 12 · PHP 8.3 · Inertia v2 (`@inertiajs/react`) on Preact 11 via preact/compat + TypeScript (SSR) · Tailwind 4 · Filament 4 admin at `/admin` · Pest 3.
 All public content lives in the database and is edited in the admin panel. See README.md for setup.
 
 ## Checks (run all four before every commit)
@@ -31,7 +31,9 @@ npm run build                 # tsc + client bundle + SSR bundle
 
 ### Frontend
 - The visual design is final. Do not restyle anything. New UI reuses the existing tokens (`--paper`, `--ink`, `--accent`, `--f-*`, …) and classes in `resources/css/app.css`.
-- No `any` in TypeScript. No business logic in React components: data comes ready-made from Resources/shared props.
+- No `any` in TypeScript. No business logic in components: data comes ready-made from Resources/shared props.
+- Components are written against the React API and import from `react`; Vite aliases `react` to `resources/js/lib/preact-react.js` (preact/compat plus an SSR-safe `use()`) and `react-dom/*` to `preact/compat/*`. tsconfig `paths` does the same for types. The SSR build bundles all dependencies (`ssr.noExternal`) so Inertia resolves the alias too. Don't add a package that needs real React internals.
+- Initial JS budget is 100 KB gzip. Decorative or on-demand code loads with `import()` (see `whenIdle()` in `lib/idle.ts` and the OrgGraph engine). Inspect the bundle with `npm run analyze` (writes `storage/app/bundle-stats.html`).
 - Pages live in `resources/js/pages`, home sections in `resources/js/components/home`, layout in `components/layout/SiteLayout.tsx`.
 
 ### Filament 4

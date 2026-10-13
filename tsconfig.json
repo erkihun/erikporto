@@ -5,6 +5,7 @@
         "moduleResolution": "bundler",
         "lib": ["ES2022", "DOM", "DOM.Iterable"],
         "jsx": "react-jsx",
+        "jsxImportSource": "preact",
         "strict": true,
         "noUncheckedIndexedAccess": true,
         "noImplicitOverride": true,
@@ -17,7 +18,13 @@
         "noEmit": true,
         "types": ["vite/client"],
         "baseUrl": ".",
-        "paths": { "@/*": ["resources/js/*"] }
+        "paths": {
+            "@/*": ["resources/js/*"],
+            "react": ["node_modules/preact/compat"],
+            "react/jsx-runtime": ["node_modules/preact/jsx-runtime"],
+            "react-dom": ["node_modules/preact/compat"],
+            "react-dom/*": ["node_modules/preact/compat/*"]
+        }
     },
     "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx"]
 }

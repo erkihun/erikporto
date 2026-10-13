@@ -1,13 +1,16 @@
-import { useRef, type AnchorHTMLAttributes, type PointerEvent, type ReactNode } from 'react';
+import { useRef, type PointerEvent, type ReactNode } from 'react';
 
-interface MagneticButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+interface MagneticButtonProps {
+    href: string;
     variant?: 'primary' | 'ghost';
     size?: 'md' | 'sm';
+    download?: boolean;
+    className?: string;
     children: ReactNode;
 }
 
 /** A link styled as a button that leans toward the cursor (mouse only, motion-safe via CSS). */
-export function MagneticButton({ variant = 'primary', size = 'md', className = '', children, ...rest }: MagneticButtonProps) {
+export function MagneticButton({ href, variant = 'primary', size = 'md', download, className = '', children }: MagneticButtonProps) {
     const ref = useRef<HTMLAnchorElement>(null);
 
     const onMove = (e: PointerEvent<HTMLAnchorElement>) => {
@@ -25,10 +28,11 @@ export function MagneticButton({ variant = 'primary', size = 'md', className = '
     return (
         <a
             ref={ref}
+            href={href}
+            download={download}
             className={`btn btn-${variant} ${size === 'sm' ? 'btn-sm' : ''} ${className}`.trim()}
             onPointerMove={onMove}
             onPointerLeave={onLeave}
-            {...rest}
         >
             {children}
         </a>

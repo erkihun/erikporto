@@ -1,6 +1,6 @@
 # Erkihun Bewket — Portfolio
 
-Laravel 12 · Inertia 2 (React 19 + TypeScript, SSR) · Tailwind 4 · Filament 4 admin · Pest.
+Laravel 12 · Inertia 2 (Preact 11 via preact/compat + TypeScript, SSR) · Tailwind 4 · Filament 4 admin · Pest.
 
 All public content lives in the database and is edited at **/admin**: profile, projects, capabilities, process, experience and education. Only the section headings are hard-coded.
 
@@ -38,7 +38,8 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 | Contact workflow | `StoreContactMessageRequest` → `SubmitContactMessage` action → queued `NewContactMessage` notification |
 | Admin | `app/Filament/Resources/*`, open only to users with `is_admin = true` |
 | Cache | `App\Support\PortfolioCache`: versioned keys, flushed when any content model is saved or deleted and after drag-reordering |
-| Frontend | `resources/js/pages` (Inertia pages), `components/home` (sections), `components/home/OrgGraph.tsx` (hero motion canvas) |
+| Frontend | `resources/js/pages` (Inertia pages), `components/home` (sections), `components/home/OrgGraph.tsx` + `lib/org-graph-engine.ts` (hero motion canvas, loaded when idle) |
+| React API | Preact via preact/compat: aliases in `vite.config.ts`, compat module `resources/js/lib/preact-react.js`. `npm run analyze` shows the bundle treemap |
 | Ethiopian calendar | `resources/js/lib/ethiopian-calendar.ts` |
 
 ### Security

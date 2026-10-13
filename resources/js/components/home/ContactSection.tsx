@@ -79,23 +79,23 @@ export function ContactSection({ profile, inquiryTypes }: { profile: Profile; in
                     <form className="cf" onSubmit={submit} noValidate>
                         <div className="two">
                             <Field id="name" label="Name" error={form.errors.name}>
-                                <input id="name" autoComplete="name" required maxLength={120} value={form.data.name} onChange={(e) => form.setData('name', e.target.value)} aria-invalid={!!form.errors.name} />
+                                <input id="name" autoComplete="name" required maxLength={120} value={form.data.name} onChange={(e) => form.setData('name', e.currentTarget.value)} aria-invalid={!!form.errors.name} />
                             </Field>
                             <Field id="email" label="Email" error={form.errors.email}>
-                                <input id="email" type="email" autoComplete="email" required maxLength={190} value={form.data.email} onChange={(e) => form.setData('email', e.target.value)} aria-invalid={!!form.errors.email} />
+                                <input id="email" type="email" autoComplete="email" required maxLength={190} value={form.data.email} onChange={(e) => form.setData('email', e.currentTarget.value)} aria-invalid={!!form.errors.email} />
                             </Field>
                         </div>
                         <Field id="inquiry_type" label="Project type" error={form.errors.inquiry_type}>
-                            <select id="inquiry_type" value={form.data.inquiry_type} onChange={(e) => form.setData('inquiry_type', e.target.value as InquiryType)}>
+                            <select id="inquiry_type" value={form.data.inquiry_type} onChange={(e) => form.setData('inquiry_type', e.currentTarget.value as InquiryType)}>
                                 {inquiryTypes.map((o) => (
                                     <option key={o.value} value={o.value}>{o.label}</option>
                                 ))}
                             </select>
                         </Field>
                         <Field id="message" label="Message" error={form.errors.message}>
-                            <textarea id="message" rows={5} required minLength={20} maxLength={5000} value={form.data.message} onChange={(e) => form.setData('message', e.target.value)} aria-invalid={!!form.errors.message} />
+                            <textarea id="message" rows={5} required minLength={20} maxLength={5000} value={form.data.message} onChange={(e) => form.setData('message', e.currentTarget.value)} aria-invalid={!!form.errors.message} />
                         </Field>
-                        <input className="hp" tabIndex={-1} autoComplete="off" name="website" aria-hidden="true" value={form.data.website} onChange={(e) => form.setData('website', e.target.value)} />
+                        <input className="hp" tabIndex={-1} autoComplete="off" name="website" aria-hidden="true" value={form.data.website} onChange={(e) => form.setData('website', e.currentTarget.value)} />
                         <div>
                             <button className="btn btn-primary" type="submit" disabled={form.processing}>
                                 {form.processing ? 'Sending…' : 'Send message'} <ArrowRight />
