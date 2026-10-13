@@ -138,6 +138,22 @@ export interface NoteShowProps {
     owner: Owner;
 }
 
+/** Mirrors App\Http\Resources\NowUpdateResource. */
+export interface NowUpdate {
+    id: number;
+    published_at: string; // ISO 8601
+    /** Server-rendered Markdown; raw HTML in the source is escaped by MarkdownRenderer. */
+    body_html: string;
+    /** Plain-text opening of the body. */
+    summary: string;
+}
+
+export interface NowPageProps {
+    current: NowUpdate;
+    previous: NowUpdate[];
+    owner: Owner;
+}
+
 export interface HomePageProps {
     profile: Profile;
     projects: ProjectSummary[];

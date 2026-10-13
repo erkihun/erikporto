@@ -5,29 +5,26 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\AnnouncesOnTelegram;
-use App\Enums\NoteStatus;
 use App\Models\Concerns\FlushesPortfolioCache;
+use App\Models\Concerns\HasPublicationDate;
 use App\Models\Concerns\QueuesTelegramAnnouncement;
 use App\Support\Markdown\MarkdownRenderer;
 use Database\Factories\NoteFactory;
-use Illuminate\Database\Eloquent\Attributes\Scope;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * @property Carbon|null $published_at
+ * Draft / scheduled / published comes from `published_at` (see HasPublicationDate).
+ *
  * @property Carbon|null $telegram_posted_at
  * @property list<string>|null $tags
  * @property list<array{id: string, text: string, level: int}>|null $toc
- * @property-read NoteStatus $status
  */
 final class Note extends Model implements AnnouncesOnTelegram
 {
     /** @use HasFactory<NoteFactory> */
-    use FlushesPortfolioCache, HasFactory, QueuesTelegramAnnouncement;
+    use FlushesPortfolioCache, HasFactory, HasPublicationDate, QueuesTelegramAnnouncement;
 
     public const TELEGRAM_TOGGLE = 'announce_notes';
 
@@ -37,34 +34,6 @@ final class Note extends Model implements AnnouncesOnTelegram
     public function getRouteKeyName(): string
     {
         return 'slug';
-    }
-
-    /** Seconds until the next scheduled note goes live, used to expire cached pages on time. */
-    public static function secondsUntilNextScheduled(): ?int
-    {
-        $next = self::query()->where('published_at', '>', now())->min('published_at');
-
-        return $next === null ? null : max(1, (int) ceil(now()->diffInSeconds(Carbon::parse($next))));
-    }
-
-    /** @param Builder<self> $query */
-    #[Scope]
-    protected function published(Builder $query): void
-    {
-        $query->whereNotNull('published_at')->where('published_at', '<=', now());
-    }
-
-    /** @param Builder<self> $query */
-    #[Scope]
-    protected function latestFirst(Builder $query): void
-    {
-        $query->orderByDesc('published_at')->orderByDesc('id');
-    }
-
-    /** @return Attribute<NoteStatus, never> */
-    protected function status(): Attribute
-    {
-        return Attribute::get(fn (): NoteStatus => NoteStatus::fromPublishedAt($this->published_at));
     }
 
     protected static function booted(): void
@@ -79,11 +48,6 @@ final class Note extends Model implements AnnouncesOnTelegram
                 ]);
             }
         });
-    }
-
-    public function isLive(): bool
-    {
-        return $this->status === NoteStatus::Published;
     }
 
     public function telegramMessage(): string

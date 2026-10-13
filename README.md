@@ -32,9 +32,10 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 
 | Concern | Where |
 | --- | --- |
-| Routes | `routes/web.php`: `/`, `/work/{slug}`, `/notes`, `/notes/{slug}`, `/feed.xml`, `POST /contact`, `/cv`, `/sitemap.xml` |
+| Routes | `routes/web.php`: `/`, `/work/{slug}`, `/notes`, `/notes/{slug}`, `/feed.xml`, `/now`, `POST /contact`, `/cv`, `/sitemap.xml` |
 | Notes | `App\Models\Note` (state derived from `published_at`), Markdown rendered safely on save by `App\Support\Markdown\MarkdownRenderer` |
 | Telegram | `AnnounceOnTelegram` job (idempotent) + `portfolio:announce` every 5 minutes; disabled until `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHANNEL_ID` are set |
+| Now page | `/now` shows the newest published `App\Models\NowUpdate` (Markdown via the same `MarkdownRenderer`); older updates collapse below as history. Edited in **Admin → Content → Now**; not announced on Telegram |
 | Page data | `app/Queries/HomePageQuery.php` and `ProjectController`, both cached |
 | API contracts | `app/Http/Resources/*` ⇄ `resources/js/types/portfolio.ts` |
 | Contact workflow | `StoreContactMessageRequest` → `SubmitContactMessage` action → queued `NewContactMessage` notification |

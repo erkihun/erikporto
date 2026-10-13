@@ -10,6 +10,7 @@ use Filament\Support\Contracts\HasLabel;
 
 /**
  * Derived from `published_at`, never stored: one column cannot disagree with itself.
+ * Used by every record with a publish date (notes, /now updates) via HasPublicationDate.
  */
 enum NoteStatus: string implements HasColor, HasLabel
 {

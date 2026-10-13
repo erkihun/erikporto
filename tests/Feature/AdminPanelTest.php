@@ -5,9 +5,11 @@ declare(strict_types=1);
 use App\Enums\NoteStatus;
 use App\Filament\Resources\ContactMessages\Pages\ViewContactMessage;
 use App\Filament\Resources\Notes\Pages\CreateNote;
+use App\Filament\Resources\NowUpdates\Pages\CreateNowUpdate;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Models\ContactMessage;
 use App\Models\Note;
+use App\Models\NowUpdate;
 use App\Models\Profile;
 use App\Models\Project;
 use App\Models\User;
@@ -107,4 +109,28 @@ it('lets admins open the notes screens', function (): void {
     $this->get('/admin/notes')->assertOk();
     $this->get('/admin/notes/create')->assertOk();
     $this->get('/admin/notes/'.Note::factory()->create()->slug.'/edit')->assertOk();
+});
+
+it('creates a scheduled now update from the admin form', function (): void {
+    $this->actingAs(User::factory()->admin()->create());
+
+    Livewire::test(CreateNowUpdate::class)
+        ->fillForm([
+            'body' => 'Shipping the **notes** section.',
+            'published_at' => now()->addDay()->format('Y-m-d H:i'),
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $update = NowUpdate::sole();
+    expect($update->status)->toBe(NoteStatus::Scheduled)
+        ->and($update->body_html)->toContain('<strong>notes</strong>');
+});
+
+it('lets admins open the now screens', function (): void {
+    $this->actingAs(User::factory()->admin()->create());
+
+    $this->get('/admin/now-updates')->assertOk();
+    $this->get('/admin/now-updates/create')->assertOk();
+    $this->get('/admin/now-updates/'.NowUpdate::factory()->create()->id.'/edit')->assertOk();
 });

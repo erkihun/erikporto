@@ -26,9 +26,10 @@ interface SiteLayoutProps {
 }
 
 export function SiteLayout({ ownerName, isHome = false, sections = true, children }: SiteLayoutProps) {
-    const { flash, hasNotes } = usePage().props;
+    const { flash, hasNotes, hasNow } = usePage().props;
     const { toggle } = useTheme();
     const prefetchNotes = usePrefetchOnFocus('/notes');
+    const prefetchNow = usePrefetchOnFocus('/now');
     const [scrolled, setScrolled] = useState(false);
     const [active, setActive] = useState<string | null>(null);
     const [toast, setToast] = useState<string | null>(null);
@@ -123,6 +124,11 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
                         ) : null}
                     </span>
                     <span className="mono" style={{ display: 'flex', gap: 18 }}>
+                        {hasNow ? (
+                            <Link href="/now" prefetch onFocus={prefetchNow} style={{ textDecoration: 'none' }}>
+                                Now
+                            </Link>
+                        ) : null}
                         {hasNotes ? (
                             <a href="/feed.xml" style={{ textDecoration: 'none' }}>
                                 RSS

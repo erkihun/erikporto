@@ -58,5 +58,7 @@ npm run build                 # tsc + client bundle + SSR bundle
 | Ethiopian calendar | `resources/js/lib/ethiopian-calendar.ts` |
 | Notes | `Note` model: draft/scheduled/published is derived from `published_at` (never stored). `body_html`, `toc`, `reading_minutes` are derived on save and are not fillable |
 | Markdown safety | `MarkdownRenderer`: `html_input=escape`, `allow_unsafe_links=false`. Never render user Markdown any other way |
+| Publication state | `HasPublicationDate` concern (Note, NowUpdate): `published()` / `latestFirst()` scopes, derived `status` (`NoteStatus`) and `isLive()` from one `published_at` column |
+| Now page | `NowUpdate` rows (`body` Markdown, derived non-fillable `body_html`); `NowController` renders the newest published one plus up to 12 older ones; `hasNow` shared prop drives the footer link |
 | Telegram | `AnnouncesOnTelegram` contract + `QueuesTelegramAnnouncement` trait; `AnnounceOnTelegram` job is idempotent (unique job + lock + `telegram_posted_at`) |
-| Scheduled content | `PortfolioCache` TTL is capped at the next scheduled note, so pages refresh on time without a cron |
+| Scheduled content | `PortfolioCache` TTL is capped at the next scheduled note or /now update (computed on a cache miss), so pages refresh on time without a cron |

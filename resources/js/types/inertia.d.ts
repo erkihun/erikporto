@@ -4,6 +4,7 @@ import type { PageProps as InertiaPageProps } from '@inertiajs/core';
 export interface SharedProps {
     app: { name: string; url: string };
     hasNotes: boolean;
+    hasNow: boolean;
     flash: { success: string | null };
     errors: Record<string, string>;
     [key: string]: unknown;

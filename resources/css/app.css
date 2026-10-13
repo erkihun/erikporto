@@ -324,3 +324,13 @@ footer{position:relative;z-index:1;padding-block:40px 56px;color:var(--muted)}
 .prose ul{list-style:disc}
 .prose ol{list-style:decimal}
 .prose li::marker{color:var(--accent)}
+
+/* ---- Now ---- */
+.now-history{margin-block:clamp(40px,6vw,72px) clamp(48px,8vw,96px)}
+.now-history summary{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:24px;align-items:baseline;padding:20px 0;cursor:pointer;list-style:none}
+.now-history summary::-webkit-details-marker{display:none}
+.now-history summary::after{content:"+";font-family:var(--f-mono);color:var(--muted)}
+.now-history details[open] summary::after{content:"\2212"}
+.now-history details{border-bottom:1px solid var(--line)}
+.now-history details .prose{padding:0 0 24px 174px}
+@media (max-width:700px){.now-history summary{grid-template-columns:minmax(0,1fr) auto;gap:8px}.now-history summary .note-date{grid-column:1/-1}.now-history details .prose{padding-left:0}}

@@ -10,4 +10,7 @@
 @foreach ($notes as $note)
     <url><loc>{{ route('notes.show', $note) }}</loc><lastmod>{{ $note->updated_at?->toAtomString() }}</lastmod></url>
 @endforeach
+@if ($now)
+    <url><loc>{{ route('now') }}</loc><lastmod>{{ $now->updated_at?->toAtomString() }}</lastmod></url>
+@endif
 </urlset>

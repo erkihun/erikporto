@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Note;
+use App\Models\NowUpdate;
 use App\Models\Project;
 use Illuminate\Http\Response;
 
@@ -18,6 +19,7 @@ final class SitemapController extends Controller
             ->view('sitemap', [
                 'projects' => $projects,
                 'notes' => Note::query()->published()->latestFirst()->get(['slug', 'updated_at']),
+                'now' => NowUpdate::query()->published()->latestFirst()->first(['updated_at']),
             ])
             ->header('Content-Type', 'application/xml');
     }

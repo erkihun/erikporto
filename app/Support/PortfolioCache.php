@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Models\Note;
+use App\Models\NowUpdate;
 use Closure;
 use Illuminate\Support\Facades\Cache;
 
@@ -12,8 +13,8 @@ use Illuminate\Support\Facades\Cache;
  * Versioned cache keys: flushing bumps the version instead of tagging,
  * which works on every cache store (file, database, redis).
  *
- * Entries also expire the moment the next scheduled note goes live,
- * so scheduled publishing needs no cron job to refresh pages.
+ * Entries also expire the moment the next scheduled note or /now update goes
+ * live, so scheduled publishing needs no cron job to refresh pages.
  */
 final class PortfolioCache
 {
@@ -50,10 +51,12 @@ final class PortfolioCache
 
     private static function ttl(): int
     {
-        $default = (int) config('portfolio.cache_ttl');
-        $untilScheduled = Note::secondsUntilNextScheduled();
+        $untilScheduled = array_filter(
+            [Note::secondsUntilNextScheduled(), NowUpdate::secondsUntilNextScheduled()],
+            static fn (?int $seconds): bool => $seconds !== null,
+        );
 
-        return $untilScheduled === null ? $default : min($default, $untilScheduled);
+        return min([(int) config('portfolio.cache_ttl'), ...$untilScheduled]);
     }
 
     private static function key(string $key): string
