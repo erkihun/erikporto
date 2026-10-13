@@ -16,7 +16,7 @@ beforeEach(function (): void {
 it('inlines the stylesheet instead of linking it', function (): void {
     $html = $this->get('/')->assertOk()->getContent();
 
-    expect($html)->toContain('<style>')
+    expect($html)->toMatch('/<style nonce="[^"]+">/')
         ->and($html)->not->toMatch('/<link[^>]+rel="stylesheet"/');
 });
 
