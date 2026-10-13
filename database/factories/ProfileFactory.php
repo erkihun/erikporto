@@ -22,7 +22,7 @@ final class ProfileFactory extends Factory
             'email' => fake()->safeEmail(),
             'is_available' => true,
             'social_links' => [['label' => 'GitHub', 'url' => 'https://github.com/example', 'handle' => '@example']],
-            'facts' => [['value' => '4', 'label' => 'Featured projects']],
+            'facts' => [['value' => '4', 'label' => ['en' => 'Featured projects']]],
         ];
     }
 }

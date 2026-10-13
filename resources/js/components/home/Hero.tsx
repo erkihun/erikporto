@@ -1,3 +1,4 @@
+import { useTrans } from '@/hooks/useTrans';
 import type { Profile } from '@/types/portfolio';
 
 import { ArrowRight, Download } from '../ui/icons';
@@ -18,6 +19,7 @@ function HeadlineParts({ headline }: { headline: string }) {
 }
 
 export function Hero({ profile }: { profile: Profile }) {
+    const t = useTrans();
     // Each word is one text run so the name is a single large paint (the LCP element);
     // the stagger offset keeps the rhythm of the former per-letter animation.
     let offset = 0;
@@ -28,7 +30,7 @@ export function Hero({ profile }: { profile: Profile }) {
                 <div>
                     <span className="status mono">
                         <i className="pulse" style={profile.is_available ? undefined : { background: 'var(--signal)' }} />
-                        <span>{profile.is_available ? 'Available for projects' : 'Currently booked'}</span>
+                        <span>{profile.is_available ? t('hero.available') : t('hero.booked')}</span>
                         {profile.location ? <span>· {profile.location}</span> : null}
                     </span>
                     <h1 className="name">
@@ -51,14 +53,14 @@ export function Hero({ profile }: { profile: Profile }) {
                     <p className="lede">{profile.lede}</p>
                     <div className="ctas">
                         <MagneticButton href="#work">
-                            View my work <ArrowRight />
+                            {t('hero.view_work')} <ArrowRight />
                         </MagneticButton>
                         <MagneticButton href="#contact" variant="ghost">
-                            Contact me
+                            {t('hero.contact')}
                         </MagneticButton>
                         {profile.cv_url ? (
                             <MagneticButton href={profile.cv_url} variant="ghost" download>
-                                Download CV <Download />
+                                {t('hero.download_cv')} <Download />
                             </MagneticButton>
                         ) : null}
                     </div>

@@ -5,12 +5,14 @@ import { SiteLayout } from '@/components/layout/SiteLayout';
 import { ArrowLeft } from '@/components/ui/icons';
 import { Seo } from '@/components/ui/Seo';
 import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
+import { useTrans } from '@/hooks/useTrans';
 import { formatDualDate } from '@/lib/format';
 import type { NoteShowProps, NoteSummary } from '@/types/portfolio';
 
 export default function NoteShow({ note, older, newer, owner }: NoteShowProps) {
+    const t = useTrans();
     const date = formatDualDate(note.published_at);
-    const activeId = useActiveHeading(note.toc.map((t) => t.id));
+    const activeId = useActiveHeading(note.toc.map((entry) => entry.id));
     const prefetchNotes = usePrefetchOnFocus('/notes');
 
     return (
@@ -20,10 +22,10 @@ export default function NoteShow({ note, older, newer, owner }: NoteShowProps) {
             <article className="wrap page-enter">
                 <header className="cs-hero note-hero">
                     <Link className="back mono" href="/notes" prefetch onFocus={prefetchNotes}>
-                        <ArrowLeft width={14} height={14} /> All notes
+                        <ArrowLeft width={14} height={14} /> {t('notes.all')}
                     </Link>
                     <span className="kicker mono">
-                        <time dateTime={note.published_at}>{date.gregorian}</time> · <span className="eth">{date.ethiopian}</span> · {note.reading_minutes} min read
+                        <time dateTime={note.published_at}>{date.gregorian}</time> · <span className="eth">{date.ethiopian}</span> · {t('notes.min_read', { n: note.reading_minutes })}
                     </span>
                     <h1>{note.title}</h1>
                     <p className="sub">{note.excerpt}</p>
@@ -40,12 +42,12 @@ export default function NoteShow({ note, older, newer, owner }: NoteShowProps) {
                     <div className="prose" dangerouslySetInnerHTML={{ __html: note.body_html }} />
 
                     {note.toc.length > 1 ? (
-                        <nav className="toc" aria-label="On this page">
-                            <span className="kicker mono">On this page</span>
+                        <nav className="toc" aria-label={t('notes.on_this_page')}>
+                            <span className="kicker mono">{t('notes.on_this_page')}</span>
                             <ol>
-                                {note.toc.map((t) => (
-                                    <li key={t.id} className={`lvl-${t.level} ${activeId === t.id ? 'active' : ''}`}>
-                                        <a href={`#${t.id}`}>{t.text}</a>
+                                {note.toc.map((entry) => (
+                                    <li key={entry.id} className={`lvl-${entry.level} ${activeId === entry.id ? 'active' : ''}`}>
+                                        <a href={`#${entry.id}`}>{entry.text}</a>
                                     </li>
                                 ))}
                             </ol>
@@ -55,15 +57,15 @@ export default function NoteShow({ note, older, newer, owner }: NoteShowProps) {
 
                 {note.tags.length > 0 ? (
                     <div className="tags" style={{ marginBottom: 40 }}>
-                        {note.tags.map((t) => (
-                            <span className="tag" key={t}>{t}</span>
+                        {note.tags.map((tag) => (
+                            <span className="tag" key={tag}>{tag}</span>
                         ))}
                     </div>
                 ) : null}
 
-                <nav className="note-pager" aria-label="More notes">
-                    <PagerLink label="Newer" note={newer} />
-                    <PagerLink label="Older" note={older} align="end" />
+                <nav className="note-pager" aria-label={t('notes.more')}>
+                    <PagerLink label={t('notes.newer')} note={newer} />
+                    <PagerLink label={t('notes.older')} note={older} align="end" />
                 </nav>
             </article>
         </SiteLayout>

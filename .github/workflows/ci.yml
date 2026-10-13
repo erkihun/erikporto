@@ -28,6 +28,54 @@ jobs:
       - run: vendor/bin/pint --test
       - run: php artisan test
 
+  # Production runs MySQL 8: JSON columns, the translatable migration and its rollback.
+  mysql:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: portfolio
+          MYSQL_ROOT_PASSWORD: password
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -ppassword"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: portfolio
+      DB_USERNAME: root
+      DB_PASSWORD: password
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, pdo_mysql, gd, zip
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: composer install --no-interaction --prefer-dist
+      - run: npm ci
+      - run: npm run build
+      - run: cp .env.example .env && php artisan key:generate
+      - name: Migrate, roll everything back, migrate again
+        run: |
+          php artisan migrate --force
+          php artisan migrate:rollback --force
+          php artisan migrate --force
+      - name: Translatable migration round trip with content
+        run: |
+          php artisan db:seed --class=DemoContentSeeder --force
+          php artisan migrate:rollback --path=database/migrations/2026_10_14_000004_make_content_translatable.php --force
+          php artisan migrate --force
+          php artisan db:seed --class=DemoContentSeeder --force
+      - run: php artisan test
+
   lighthouse:
     runs-on: ubuntu-latest
     steps:

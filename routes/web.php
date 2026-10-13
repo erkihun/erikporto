@@ -12,14 +12,26 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', HomeController::class)->name('home');
-Route::get('/work/{project}', [ProjectController::class, 'show'])->name('projects.show');
+/*
+ * Pages that exist in every language: English at `/`, Amharic under `/am`
+ * (route names "home" / "am.home"; see App\Enums\Locale and App\Support\LocalizedUrls).
+ */
+$localized = static function (): void {
+    Route::get('/', HomeController::class)->name('home');
+    Route::get('/work/{project}', [ProjectController::class, 'show'])->name('projects.show');
+    Route::post('/contact', [ContactMessageController::class, 'store'])
+        ->middleware('throttle:contact')
+        ->name('contact.store');
+};
+
+Route::middleware('locale:en')->group($localized);
+Route::prefix('am')->name('am.')->middleware('locale:am')->group($localized);
+
+// Written in one language and not translated.
 Route::get('/notes', [NoteController::class, 'index'])->name('notes.index');
 Route::get('/notes/{note}', [NoteController::class, 'show'])->name('notes.show');
 Route::get('/feed.xml', FeedController::class)->name('feed');
 Route::get('/now', NowController::class)->name('now');
-Route::post('/contact', [ContactMessageController::class, 'store'])
-    ->middleware('throttle:contact')
-    ->name('contact.store');
+
 Route::get('/cv', CvDownloadController::class)->middleware('throttle:30,1')->name('cv.download');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');

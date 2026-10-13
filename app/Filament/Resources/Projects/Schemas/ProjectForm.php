@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Projects\Schemas;
 
+use App\Enums\Locale;
 use App\Enums\ProjectCategory;
+use App\Filament\Support\LocaleTabs;
 use App\Models\Project;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -29,47 +30,47 @@ final class ProjectForm
             ->components([
                 Grid::make(1)->columnSpan(2)->schema([
                     Section::make('Overview')->columns(2)->schema([
-                        TextInput::make('title')
-                            ->required()
-                            ->maxLength(120)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(static function (Get $get, Set $set, ?string $state, string $operation): void {
-                                if ($operation === 'create' && blank($get('slug'))) {
-                                    $set('slug', Str::slug((string) $state));
-                                }
-                            }),
+                        LocaleTabs::make('Overview copy', static fn (Locale $locale, bool $required): array => [
+                            TextInput::make(LocaleTabs::path('title', $locale))
+                                ->label('Title')
+                                ->required($required)
+                                ->maxLength(120)
+                                ->live(onBlur: true, condition: $required)
+                                ->afterStateUpdated(static function (Get $get, Set $set, ?string $state, string $operation) use ($required): void {
+                                    if ($required && $operation === 'create' && blank($get('slug'))) {
+                                        $set('slug', Str::slug((string) $state));
+                                    }
+                                }),
+                            TextInput::make(LocaleTabs::path('subtitle', $locale))->label('Subtitle')->maxLength(200),
+                            Textarea::make(LocaleTabs::path('summary', $locale))
+                                ->label('Summary')
+                                ->required($required)
+                                ->maxLength(300)
+                                ->rows(2)
+                                ->helperText('One sentence shown on the project card.'),
+                        ]),
                         TextInput::make('slug')
                             ->required()
                             ->maxLength(120)
                             ->alphaDash()
                             ->unique(ignoreRecord: true)
-                            ->helperText('Used in the URL: /work/{slug}'),
-                        TextInput::make('subtitle')->maxLength(200)->columnSpanFull(),
-                        Textarea::make('summary')
-                            ->required()
-                            ->maxLength(300)
-                            ->rows(2)
-                            ->helperText('One sentence shown on the project card.')
+                            ->helperText('Used in the URL: /work/{slug}. Filled from the English title.')
                             ->columnSpanFull(),
                     ]),
                     Section::make('Case study')
                         ->description('Problem → role → solution → outcome. Keep each part short and concrete.')
                         ->schema([
-                            Textarea::make('problem')->required()->rows(3)->maxLength(3000),
-                            Textarea::make('role')->label('My role')->required()->rows(2)->maxLength(2000),
-                            Textarea::make('solution')->required()->rows(4)->maxLength(4000),
-                            Textarea::make('outcome')->required()->rows(2)->maxLength(2000),
-                            Repeater::make('metrics')
+                            LocaleTabs::make('Case study copy', static fn (Locale $locale, bool $required): array => [
+                                Textarea::make(LocaleTabs::path('problem', $locale))->label('Problem')->required($required)->rows(3)->maxLength(3000),
+                                Textarea::make(LocaleTabs::path('role', $locale))->label('My role')->required($required)->rows(2)->maxLength(2000),
+                                Textarea::make(LocaleTabs::path('solution', $locale))->label('Solution')->required($required)->rows(4)->maxLength(4000),
+                                Textarea::make(LocaleTabs::path('outcome', $locale))->label('Outcome')->required($required)->rows(2)->maxLength(2000),
+                            ]),
+                            LocaleTabs::labelledList('metrics', valueLength: 20, labelLength: 80)
                                 ->label('Measured results')
                                 ->helperText('Verified numbers only, e.g. "1,200" / "employee records migrated".')
-                                ->schema([
-                                    TextInput::make('value')->required()->maxLength(20),
-                                    TextInput::make('label')->required()->maxLength(80),
-                                ])
-                                ->columns(2)
                                 ->maxItems(4)
-                                ->defaultItems(0)
-                                ->reorderable(),
+                                ->defaultItems(0),
                         ]),
                     Section::make('Media')->schema([
                         FileUpload::make('cover_path')

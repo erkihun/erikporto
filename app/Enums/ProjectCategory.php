@@ -14,8 +14,8 @@ enum ProjectCategory: string implements HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::Software => 'Software',
-            self::Design => 'Design',
+            self::Software => __('enums.category.software'),
+            self::Design => __('enums.category.design'),
         };
     }
 
@@ -23,8 +23,8 @@ enum ProjectCategory: string implements HasLabel
     public function kind(): string
     {
         return match ($this) {
-            self::Software => 'Web system',
-            self::Design => 'Brand identity',
+            self::Software => __('enums.category.software_kind'),
+            self::Design => __('enums.category.design_kind'),
         };
     }
 }

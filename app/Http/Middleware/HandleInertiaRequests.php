@@ -4,17 +4,25 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Enums\Locale;
 use App\Models\Note;
 use App\Models\NowUpdate;
+use App\Support\LocalizedUrls;
 use App\Support\PortfolioCache;
+use App\Support\Translations;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
 
 final class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'app';
 
-    /** @return array<string, mixed> */
+    /**
+     * Closures resolve when the page renders, after SetLocale has run.
+     *
+     * @return array<string, mixed>
+     */
     public function share(Request $request): array
     {
         return [
@@ -23,6 +31,14 @@ final class HandleInertiaRequests extends Middleware
                 'name' => config('app.name'),
                 'url' => config('app.url'),
             ],
+            'locale' => fn (): string => Locale::current()->value,
+            'locales' => fn (): array => LocalizedUrls::alternates($request),
+            'urls' => fn (): array => [
+                'home' => LocalizedUrls::route('home'),
+                'contact' => LocalizedUrls::route('contact.store'),
+            ],
+            // Sent once per visit; switching language is a full page load.
+            'translations' => Inertia::once(fn (): array => Translations::for(Locale::current())),
             // Drives the "Notes" nav link; cached, so no query on most requests.
             'hasNotes' => fn (): bool => PortfolioCache::remember(
                 'nav:has-notes',
@@ -34,7 +50,7 @@ final class HandleInertiaRequests extends Middleware
                 static fn (): string => NowUpdate::query()->published()->exists() ? 'yes' : 'no',
             ) === 'yes',
             'flash' => [
-                'success' => fn (): ?string => $request->session()->get('success'),
+                'success' => fn (): ?string => $request->hasSession() ? $request->session()->get('success') : null,
             ],
         ];
     }

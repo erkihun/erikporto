@@ -16,10 +16,10 @@ enum InquiryType: string implements HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::WebSystem => 'Web system / application',
-            self::BrandIdentity => 'Logo & brand identity',
-            self::UiUx => 'UI/UX design',
-            self::Other => 'Something else',
+            self::WebSystem => __('enums.inquiry.web_system'),
+            self::BrandIdentity => __('enums.inquiry.brand_identity'),
+            self::UiUx => __('enums.inquiry.ui_ux'),
+            self::Other => __('enums.inquiry.other'),
         };
     }
 

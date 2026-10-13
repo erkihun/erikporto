@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import { useRef, type PointerEvent } from 'react';
 
 import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
+import { useTrans } from '@/hooks/useTrans';
 import type { ProjectSummary } from '@/types/portfolio';
 
 import { ArrowUpRight } from '../ui/icons';
@@ -10,6 +11,7 @@ import { ProjectVisual } from './ProjectMock';
 export function ProjectCard({ project, hidden }: { project: ProjectSummary; hidden: boolean }) {
     const ref = useRef<HTMLAnchorElement>(null);
     const prefetchOnFocus = usePrefetchOnFocus(project.url);
+    const t = useTrans();
 
     const onMove = (e: PointerEvent<HTMLAnchorElement>) => {
         const el = ref.current;
@@ -35,7 +37,7 @@ export function ProjectCard({ project, hidden }: { project: ProjectSummary; hidd
             onPointerLeave={onLeave}
         >
             <span className="shot">
-                <ProjectVisual coverUrl={project.cover_url} mock={project.mock} alt={`${project.title} screenshot`} />
+                <ProjectVisual coverUrl={project.cover_url} mock={project.mock} alt={t('work.screenshot_alt', { title: project.title })} />
             </span>
             <span className="open">
                 <ArrowUpRight />
@@ -43,7 +45,7 @@ export function ProjectCard({ project, hidden }: { project: ProjectSummary; hidd
             <span className="meta">
                 <span className="row mono">
                     <span>{project.kind}</span>
-                    <span>{project.year ?? 'Case study'}</span>
+                    <span>{project.year ?? t('work.case_study')}</span>
                 </span>
                 <h3>{project.title}</h3>
                 <p>{project.summary}</p>

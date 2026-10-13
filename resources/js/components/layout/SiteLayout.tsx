@@ -3,18 +3,20 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 
 import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
 import { useTheme } from '@/hooks/useTheme';
+import { useTrans } from '@/hooks/useTrans';
 import { formatEthiopian } from '@/lib/ethiopian-calendar';
+import type { TransKey } from '@/types/inertia';
 
 import { Monogram, Sun } from '../ui/icons';
 import { Toast } from '../ui/Toast';
 
-const SECTIONS = [
-    ['work', 'Work'],
-    ['capabilities', 'Capabilities'],
-    ['experience', 'Experience'],
-    ['about', 'About'],
-    ['contact', 'Contact'],
-] as const;
+const SECTIONS: readonly (readonly [string, TransKey])[] = [
+    ['work', 'nav.work'],
+    ['capabilities', 'nav.capabilities'],
+    ['experience', 'nav.experience'],
+    ['about', 'nav.about'],
+    ['contact', 'nav.contact'],
+];
 
 interface SiteLayoutProps {
     ownerName: string;
@@ -26,8 +28,10 @@ interface SiteLayoutProps {
 }
 
 export function SiteLayout({ ownerName, isHome = false, sections = true, children }: SiteLayoutProps) {
-    const { flash, hasNotes, hasNow } = usePage().props;
+    const { flash, hasNotes, hasNow, locale, locales, urls } = usePage().props;
+    const t = useTrans();
     const { toggle } = useTheme();
+    const prefetchHome = usePrefetchOnFocus(urls.home);
     const prefetchNotes = usePrefetchOnFocus('/notes');
     const prefetchNow = usePrefetchOnFocus('/now');
     const [scrolled, setScrolled] = useState(false);
@@ -35,7 +39,7 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
     const [toast, setToast] = useState<string | null>(null);
     const [today, setToday] = useState<{ greg: string; eth: string } | null>(null);
     const firstName = ownerName.split(' ')[0] ?? ownerName;
-    const href = (id: string) => (isHome ? `#${id}` : `/#${id}`);
+    const href = (id: string) => (isHome ? `#${id}` : `${urls.home}#${id}`);
 
     useEffect(() => setToast(flash.success), [flash.success]);
     const clearToast = useCallback(() => setToast(null), []);
@@ -43,8 +47,9 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
     // Dates are client-only so SSR markup never disagrees with the visitor's local day.
     useEffect(() => {
         const now = new Date();
-        setToday({ greg: now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }), eth: formatEthiopian(now) });
-    }, []);
+        const greg = now.toLocaleDateString(locale === 'am' ? 'am-ET' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        setToday({ greg, eth: formatEthiopian(now) });
+    }, [locale]);
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 8);
@@ -78,32 +83,48 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
 
     return (
         <>
-            <a className="skip" href="#main">Skip to content</a>
+            <a className="skip" href="#main">{t('nav.skip')}</a>
             <div className="progress" aria-hidden="true" />
             <div className="spot" aria-hidden="true" />
 
             <header className={`nav ${scrolled ? 'scrolled' : ''}`}>
                 <div className="wrap nav-in">
-                    <Link className="brand" href="/" aria-label={`${ownerName}, home`}>
+                    <Link className="brand" href={urls.home} prefetch onFocus={prefetchHome} aria-label={t('nav.home_label', { name: ownerName })}>
                         <Monogram />
                         <span>{firstName}</span>
                     </Link>
                     {sections ? (
-                        <nav className="nav-links" aria-label="Sections">
+                        <nav className="nav-links" aria-label={t('nav.sections')}>
                             {SECTIONS.map(([id, label]) => (
                                 <a key={id} href={href(id)} className={active === id ? 'active' : undefined}>
-                                    {label}
+                                    {t(label)}
                                 </a>
                             ))}
-                            {hasNotes ? <Link href="/notes" prefetch onFocus={prefetchNotes}>Notes</Link> : null}
+                            {hasNotes ? <Link href="/notes" prefetch onFocus={prefetchNotes}>{t('nav.notes')}</Link> : null}
                         </nav>
                     ) : null}
-                    <button className="icon-btn" type="button" onClick={toggle} aria-label="Toggle colour theme" style={sections ? undefined : { marginLeft: 'auto' }}>
+                    {/* Full page loads: <html lang>, fonts and cached props all switch with the language. */}
+                    <nav className="lang" aria-label={t('nav.language')} style={sections ? undefined : { marginLeft: 'auto' }}>
+                        {locales.map((option) => (
+                            <a
+                                key={option.code}
+                                className="chip"
+                                href={option.url}
+                                hrefLang={option.hreflang}
+                                lang={option.code}
+                                title={option.name}
+                                aria-current={option.current ? 'page' : undefined}
+                            >
+                                {option.label}
+                            </a>
+                        ))}
+                    </nav>
+                    <button className="icon-btn" type="button" onClick={toggle} aria-label={t('nav.theme')}>
                         <Sun />
                     </button>
                     {sections ? (
                         <a className="btn btn-primary btn-sm" href={href('contact')}>
-                            Hire me
+                            {t('nav.hire')}
                         </a>
                     ) : null}
                 </div>
@@ -118,24 +139,30 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
                     </span>
                     <span className="mono">
                         {today ? (
-                            <>
-                                {today.greg} · <span className="eth">{today.eth}</span>
-                            </>
+                            locale === 'am' ? (
+                                <>
+                                    <span className="eth">{today.eth}</span> · {today.greg}
+                                </>
+                            ) : (
+                                <>
+                                    {today.greg} · <span className="eth">{today.eth}</span>
+                                </>
+                            )
                         ) : null}
                     </span>
                     <span className="mono" style={{ display: 'flex', gap: 18 }}>
                         {hasNow ? (
                             <Link href="/now" prefetch onFocus={prefetchNow} style={{ textDecoration: 'none' }}>
-                                Now
+                                {t('footer.now')}
                             </Link>
                         ) : null}
                         {hasNotes ? (
                             <a href="/feed.xml" style={{ textDecoration: 'none' }}>
-                                RSS
+                                {t('footer.rss')}
                             </a>
                         ) : null}
                         <a href="#main" style={{ textDecoration: 'none' }}>
-                            Back to top ↑
+                            {t('footer.back_to_top')}
                         </a>
                     </span>
                 </div>

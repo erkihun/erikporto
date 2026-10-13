@@ -1,14 +1,17 @@
+import { useTrans } from '@/hooks/useTrans';
 import type { Experience } from '@/types/portfolio';
 
 import { SectionHeading } from './SectionHeading';
 
 export function Timeline({ items }: { items: Experience[] }) {
+    const t = useTrans();
+
     if (items.length === 0) return null;
 
     return (
         <section className="block wrap" id="experience">
-            <SectionHeading kicker="Experience & education" title="Where I’ve worked and studied.">
-                Public-sector software development, alongside graphic design and brand identity work.
+            <SectionHeading kicker={t('experience.kicker')} title={t('experience.title')}>
+                {t('experience.intro')}
             </SectionHeading>
             <div className="timeline">
                 {items.map((x) => (

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources\SkillGroups;
 
 use App\Enums\Discipline;
+use App\Enums\Locale;
 use App\Filament\Resources\SkillGroups\Pages\ManageSkillGroups;
+use App\Filament\Support\LocaleTabs;
 use App\Models\SkillGroup;
 use App\Support\PortfolioCache;
 use BackedEnum;
@@ -40,7 +42,9 @@ final class SkillGroupResource extends Resource
     {
         return $schema->components([
             Select::make('discipline')->options(Discipline::class)->required(),
-            TextInput::make('label')->required()->maxLength(60),
+            LocaleTabs::make('Label', static fn (Locale $locale, bool $required): array => [
+                TextInput::make(LocaleTabs::path('label', $locale))->label('Label')->required($required)->maxLength(60),
+            ]),
             TagsInput::make('items')->required()->columnSpanFull(),
         ]);
     }

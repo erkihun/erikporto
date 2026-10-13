@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\Profile;
+use App\Support\Localized;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -21,9 +22,9 @@ final class ProfileResource extends JsonResource
             'name' => $this->name,
             'headline' => $this->headline,
             'lede' => $this->lede,
-            'bio' => $this->bio,
-            'about_statement' => $this->about_statement,
-            'location' => $this->location,
+            'bio' => array_values(array_filter((array) $this->bio, 'filled')),
+            'about_statement' => Localized::text($this->about_statement),
+            'location' => Localized::text($this->location),
             'email' => $this->email,
             'is_available' => $this->is_available,
             'avatar_url' => $this->avatar_path ? Storage::disk('public')->url($this->avatar_path) : null,
@@ -32,8 +33,8 @@ final class ProfileResource extends JsonResource
                 $this->social_links ?? [],
                 static fn (array $link): bool => filled($link['url'] ?? null),
             )),
-            'facts' => $this->facts ?? [],
-            'meta_description' => $this->meta_description ?? $this->lede,
+            'facts' => Localized::labelled($this->facts),
+            'meta_description' => Localized::text($this->meta_description) ?? $this->lede,
         ];
     }
 }

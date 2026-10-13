@@ -1,21 +1,23 @@
 import { SiteLayout } from '@/components/layout/SiteLayout';
 import { Seo } from '@/components/ui/Seo';
+import { useTrans } from '@/hooks/useTrans';
 import { formatDate, formatDualDate } from '@/lib/format';
 import type { NowPageProps, NowUpdate } from '@/types/portfolio';
 
 export default function Now({ current, previous, owner }: NowPageProps) {
+    const t = useTrans();
     const updated = formatDualDate(current.published_at);
 
     return (
         <SiteLayout ownerName={owner.name ?? 'Portfolio'}>
-            <Seo title="Now" description={current.summary} />
+            <Seo title={t('now.title')} description={current.summary} />
 
             <article className="wrap page-enter">
                 <header className="cs-hero">
                     <span className="kicker mono">
-                        Last updated <time dateTime={current.published_at}>{updated.gregorian}</time> · <span className="eth">{updated.ethiopian}</span>
+                        {t('now.last_updated')} <time dateTime={current.published_at}>{updated.gregorian}</time> · <span className="eth">{updated.ethiopian}</span>
                     </span>
-                    <h1>Now</h1>
+                    <h1>{t('now.title')}</h1>
                 </header>
 
                 <div className="note-layout single">
@@ -24,16 +26,16 @@ export default function Now({ current, previous, owner }: NowPageProps) {
                 </div>
 
                 <p style={{ color: 'var(--muted)', fontSize: 14 }}>
-                    This is a{' '}
+                    {t('now.small_print_before')}{' '}
                     <a href="https://nownownow.com/about" target="_blank" rel="noopener noreferrer">
-                        now page
+                        {t('now.small_print_link')}
                     </a>
-                    : what I’m focused on at this point in my life, updated about once a month.
+                    {t('now.small_print_after')}
                 </p>
 
                 {previous.length > 0 ? (
                     <section className="now-history" aria-labelledby="previous-updates">
-                        <h2 id="previous-updates" className="kicker mono">Previous updates</h2>
+                        <h2 id="previous-updates" className="kicker mono">{t('now.previous')}</h2>
                         <div className="note-list">
                             {previous.map((update) => (
                                 <PreviousUpdate key={update.id} update={update} />

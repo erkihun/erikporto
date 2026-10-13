@@ -1,14 +1,17 @@
+import { useTrans } from '@/hooks/useTrans';
 import type { Capability } from '@/types/portfolio';
 
 import { SectionHeading } from './SectionHeading';
 
 export function Capabilities({ capabilities }: { capabilities: Capability[] }) {
+    const t = useTrans();
+
     if (capabilities.length === 0) return null;
 
     return (
         <section className="block wrap" id="capabilities">
-            <SectionHeading kicker="Capabilities" title="Two disciplines, one standard.">
-                I design the interface and build the system behind it, so the data model, the permissions and the visual language stay consistent.
+            <SectionHeading kicker={t('capabilities.kicker')} title={t('capabilities.title')}>
+                {t('capabilities.intro')}
             </SectionHeading>
             <div className="caps">
                 {capabilities.map((c) => (

@@ -1,14 +1,17 @@
 import { useState } from 'react';
 
+import { useTrans } from '@/hooks/useTrans';
+import type { TransKey } from '@/types/inertia';
 import type { ProjectCategory, ProjectSummary } from '@/types/portfolio';
 
 import { ProjectCard } from './ProjectCard';
 import { SectionHeading } from './SectionHeading';
 
 type Filter = 'all' | ProjectCategory;
-const FILTERS: [Filter, string][] = [['all', 'All'], ['software', 'Software'], ['design', 'Design']];
+const FILTERS: [Filter, TransKey][] = [['all', 'work.filter_all'], ['software', 'work.filter_software'], ['design', 'work.filter_design']];
 
 export function WorkSection({ projects }: { projects: ProjectSummary[] }) {
+    const t = useTrans();
     const [filter, setFilter] = useState<Filter>('all');
     const count = (f: Filter) => (f === 'all' ? projects.length : projects.filter((p) => p.category === f).length);
 
@@ -23,13 +26,13 @@ export function WorkSection({ projects }: { projects: ProjectSummary[] }) {
 
     return (
         <section className="block wrap" id="work">
-            <SectionHeading kicker="Selected work" title="Systems that run institutions. Identities that represent them.">
-                Each project is written as a case study: the problem, my role, how it was solved, and what changed.
+            <SectionHeading kicker={t('work.kicker')} title={t('work.title')}>
+                {t('work.intro')}
             </SectionHeading>
-            <div className="filters" role="group" aria-label="Filter projects">
+            <div className="filters" role="group" aria-label={t('work.filter_label')}>
                 {FILTERS.filter(([f]) => count(f) > 0).map(([f, label]) => (
                     <button key={f} type="button" className="chip" aria-pressed={filter === f} onClick={() => choose(f)}>
-                        {label}
+                        {t(label)}
                         <span className="n">{count(f)}</span>
                     </button>
                 ))}

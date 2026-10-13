@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\Discipline;
 use App\Models\Concerns\FlushesPortfolioCache;
+use App\Models\Concerns\HasLocalizedContent;
 use Database\Factories\SkillGroupFactory;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +20,10 @@ use Illuminate\Database\Eloquent\Model;
 final class SkillGroup extends Model
 {
     /** @use HasFactory<SkillGroupFactory> */
-    use FlushesPortfolioCache, HasFactory;
+    use FlushesPortfolioCache, HasFactory, HasLocalizedContent;
+
+    /** @var list<string> English and Amharic per field; the slug, URLs, tags and enums are not translated. */
+    public array $translatable = ['label'];
 
     protected $fillable = ['discipline', 'label', 'items', 'sort_order'];
 

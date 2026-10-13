@@ -34,8 +34,14 @@ npm run perf                  # Lighthouse CI (lighthouserc.cjs) against scripts
 - Every Inertia prop shape comes from an API Resource in `app/Http/Resources` and is mirrored in `resources/js/types/portfolio.ts`. Change both together.
 - Shared props are defined in `App\Http\Middleware\HandleInertiaRequests` and typed in `resources/js/types/inertia.d.ts`.
 
+### Languages
+- Public pages exist in English (`/`) and Amharic (`/am`). Localized routes are registered twice in `routes/web.php`; build their URLs with `App\Support\LocalizedUrls::route()` (server) or the shared `urls` prop (client), never hard-coded `/`.
+- Translatable columns use `HasLocalizedContent` (spatie/laravel-translatable; blank values are dropped so reads fall back to English). Read them in Resources through `App\Support\Localized` (`pick`, `text`, `labelled` for `{value, label}` lists).
+- UI strings: add the key to both `lang/en.json` and `lang/am.json` (a test checks parity), then use `useTrans()` in components. New Amharic text is a draft until reviewed: note it as `TODO(review-am)` in the commit or summary.
+- Admin forms bind translatable fields as `title.en` / `title.am` through `App\Filament\Support\LocaleTabs`.
+
 ### Caching
-- Public page payloads are cached through `App\Support\PortfolioCache::remember()` (versioned keys, works on every cache store).
+- Public page payloads are cached through `App\Support\PortfolioCache::remember()` (versioned keys that include the locale, works on every cache store).
 - Content models use the `FlushesPortfolioCache` trait. Bulk queries that skip model events (e.g. Filament drag-reordering) must call `PortfolioCache::flush()` explicitly.
 
 ### Frontend
@@ -55,7 +61,7 @@ npm run perf                  # Lighthouse CI (lighthouserc.cjs) against scripts
 ## Working rules
 - Ask before adding any Composer or npm package. Verify Laravel 12 / Filament 4 / PHP 8.3 support from the package's composer.json before proposing it.
 - One commit per logical change, conventional commit messages (`feat:`, `fix:`, `docs:`, `chore:`, `test:`).
-- Tests use Pest with `RefreshDatabase` on in-memory SQLite. Migrations must also work on MySQL.
+- Tests use Pest with `RefreshDatabase` on in-memory SQLite. Migrations must also work on MySQL 8 (the `mysql` CI job migrates, rolls back, migrates again and runs the suite).
 
 ## Where things live
 | Concern | Location |

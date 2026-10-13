@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Profiles\Schemas;
 
+use App\Enums\Locale;
+use App\Filament\Support\LocaleTabs;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
@@ -23,36 +25,33 @@ final class ProfileForm
                 Grid::make(1)->columnSpan(2)->schema([
                     Section::make('Hero')->columns(2)->schema([
                         TextInput::make('name')->required()->maxLength(120),
-                        TextInput::make('headline')->required()->maxLength(160),
-                        Textarea::make('lede')
-                            ->label('Intro sentence')
-                            ->required()
-                            ->maxLength(400)
-                            ->rows(3)
-                            ->columnSpanFull(),
                         Toggle::make('is_available')->label('Available for projects')->inline(false),
-                        TextInput::make('location')->maxLength(120),
+                        LocaleTabs::make('Hero copy', static fn (Locale $locale, bool $required): array => [
+                            TextInput::make(LocaleTabs::path('headline', $locale))->label('Headline')->required($required)->maxLength(160),
+                            Textarea::make(LocaleTabs::path('lede', $locale))
+                                ->label('Intro sentence')
+                                ->required($required)
+                                ->maxLength(400)
+                                ->rows(3),
+                            TextInput::make(LocaleTabs::path('location', $locale))->label('Location')->maxLength(120),
+                        ]),
                     ]),
                     Section::make('About')->schema([
-                        TextInput::make('about_statement')->label('Statement')->maxLength(240),
-                        Repeater::make('bio')
-                            ->label('Bio paragraphs')
-                            ->simple(Textarea::make('paragraph')->required()->rows(3)->maxLength(1200))
-                            ->minItems(1)
-                            ->maxItems(5)
-                            ->reorderable(),
+                        LocaleTabs::make('About copy', static fn (Locale $locale, bool $required): array => [
+                            TextInput::make(LocaleTabs::path('about_statement', $locale))->label('Statement')->maxLength(240),
+                            Repeater::make(LocaleTabs::path('bio', $locale))
+                                ->label('Bio paragraphs')
+                                ->simple(Textarea::make('paragraph')->required()->rows(3)->maxLength(1200))
+                                ->minItems($required ? 1 : 0)
+                                ->defaultItems($required ? 1 : 0)
+                                ->maxItems(5)
+                                ->reorderable(),
+                        ]),
                     ]),
                     Section::make('Highlights')
                         ->description('Short facts shown under the hero, e.g. "4" / "Featured projects".')
                         ->schema([
-                            Repeater::make('facts')
-                                ->schema([
-                                    TextInput::make('value')->required()->maxLength(20),
-                                    TextInput::make('label')->required()->maxLength(60),
-                                ])
-                                ->columns(2)
-                                ->maxItems(4)
-                                ->reorderable(),
+                            LocaleTabs::labelledList('facts', valueLength: 20, labelLength: 60)->maxItems(4),
                         ]),
                 ]),
                 Grid::make(1)->columnSpan(1)->schema([
@@ -88,7 +87,13 @@ final class ProfileForm
                             ->downloadable(),
                     ]),
                     Section::make('SEO')->schema([
-                        Textarea::make('meta_description')->maxLength(300)->rows(3)->helperText('Defaults to the intro sentence.'),
+                        LocaleTabs::make('SEO copy', static fn (Locale $locale): array => [
+                            Textarea::make(LocaleTabs::path('meta_description', $locale))
+                                ->label('Meta description')
+                                ->maxLength(300)
+                                ->rows(3)
+                                ->helperText('Defaults to the intro sentence.'),
+                        ]),
                     ]),
                 ]),
             ]);

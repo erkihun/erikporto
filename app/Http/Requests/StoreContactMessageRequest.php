@@ -32,8 +32,18 @@ final class StoreContactMessageRequest extends FormRequest
     /** @return array<string, string> */
     public function messages(): array
     {
+        // Shown in the visitor's language (lang/{locale}.json).
         return [
-            'message.min' => 'Tell me a little more (at least :min characters).',
+            'name.required' => __('contact.validation.name_required'),
+            'name.max' => __('contact.validation.name_max'),
+            'email.required' => __('contact.validation.email_required'),
+            'email.email' => __('contact.validation.email_invalid'),
+            'email.max' => __('contact.validation.email_max'),
+            'inquiry_type.required' => __('contact.validation.type_required'),
+            'inquiry_type.enum' => __('contact.validation.type_invalid'),
+            'message.required' => __('contact.validation.message_required'),
+            'message.min' => __('contact.validation.message_min'),
+            'message.max' => __('contact.validation.message_max'),
         ];
     }
 

@@ -1,14 +1,17 @@
+import { useTrans } from '@/hooks/useTrans';
 import type { ProcessStep } from '@/types/portfolio';
 
 import { SectionHeading } from './SectionHeading';
 
 export function Process({ steps }: { steps: ProcessStep[] }) {
+    const t = useTrans();
+
     if (steps.length === 0) return null;
 
     return (
         <section className="block wrap" id="process">
-            <SectionHeading kicker="How I work" title="From paper process to working system.">
-                Most of my projects replace a manual institutional workflow. This is the order I take them in.
+            <SectionHeading kicker={t('process.kicker')} title={t('process.title')}>
+                {t('process.intro')}
             </SectionHeading>
             <ol className="process" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {steps.map((s, i) => (

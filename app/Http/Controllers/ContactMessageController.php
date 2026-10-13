@@ -17,6 +17,6 @@ final class ContactMessageController extends Controller
             $submit->handle($request->toData());
         }
 
-        return back()->with('success', 'Thanks, your message is on its way. I’ll reply within two working days.');
+        return back()->with('success', __('contact.flash.sent'));
     }
 }

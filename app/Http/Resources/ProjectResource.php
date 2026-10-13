@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\Project;
+use App\Support\Localized;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -26,7 +27,7 @@ final class ProjectResource extends ProjectSummaryResource
             'role' => $this->role,
             'solution' => $this->solution,
             'outcome' => $this->outcome,
-            'metrics' => $this->metrics ?? [],
+            'metrics' => Localized::labelled($this->metrics),
             'tools' => $this->tools ?? [],
             'repository_url' => $this->repository_url,
             'live_url' => $this->live_url,

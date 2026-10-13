@@ -6,7 +6,9 @@ use App\Enums\NoteStatus;
 use App\Filament\Resources\ContactMessages\Pages\ViewContactMessage;
 use App\Filament\Resources\Notes\Pages\CreateNote;
 use App\Filament\Resources\NowUpdates\Pages\CreateNowUpdate;
+use App\Filament\Resources\Profiles\Pages\EditProfile;
 use App\Filament\Resources\Projects\Pages\CreateProject;
+use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Models\ContactMessage;
 use App\Models\Note;
 use App\Models\NowUpdate;
@@ -43,26 +45,77 @@ it('opens the profile editor directly', function (): void {
         ->assertRedirect("/admin/profiles/{$profile->id}/edit");
 });
 
-it('creates a project from the admin form', function (): void {
+it('creates a project from the admin form with English and Amharic copy', function (): void {
     $this->actingAs(User::factory()->admin()->create());
 
     Livewire::test(CreateProject::class)
         ->fillForm([
-            'title' => 'Court Case Management',
+            'title.en' => 'Court Case Management',
+            'title.am' => 'የፍርድ ቤት ጉዳዮች አስተዳደር',
             'slug' => 'court-ms',
             'category' => 'software',
-            'summary' => 'Tracks cases.',
-            'problem' => 'Manual files.',
-            'role' => 'Developer.',
-            'solution' => 'A web system.',
-            'outcome' => 'Faster follow-up.',
+            'summary.en' => 'Tracks cases.',
+            'problem.en' => 'Manual files.',
+            'role.en' => 'Developer.',
+            'solution.en' => 'A web system.',
+            'outcome.en' => 'Faster follow-up.',
             'stack' => ['Laravel'],
             'is_published' => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
-    expect(Project::query()->where('slug', 'court-ms')->sole()->stack)->toBe(['Laravel']);
+    $project = Project::query()->where('slug', 'court-ms')->sole();
+    expect($project->stack)->toBe(['Laravel'])
+        ->and($project->getTranslations('title'))->toBe(['en' => 'Court Case Management', 'am' => 'የፍርድ ቤት ጉዳዮች አስተዳደር'])
+        // Left blank in the Amharic tab: not stored, so /am falls back to English.
+        ->and($project->getTranslations('summary'))->toBe(['en' => 'Tracks cases.']);
+});
+
+it('fills the slug from the English title', function (): void {
+    $this->actingAs(User::factory()->admin()->create());
+
+    Livewire::test(CreateProject::class)
+        ->fillForm(['title.en' => 'Recruitment Portal'])
+        ->assertSchemaStateSet(['slug' => 'recruitment-portal']);
+});
+
+it('requires the English copy but not the Amharic', function (): void {
+    $this->actingAs(User::factory()->admin()->create());
+
+    Livewire::test(CreateProject::class)
+        ->fillForm(['title.am' => 'ፕሮጀክት', 'slug' => 'x', 'category' => 'software', 'stack' => ['PHP']])
+        ->call('create')
+        ->assertHasFormErrors(['title.en' => 'required', 'summary.en' => 'required'])
+        ->assertHasNoFormErrors(['summary.am', 'problem.am']);
+});
+
+it('loads both languages into the project edit form', function (): void {
+    $project = Project::factory()->create(['title' => ['en' => 'EUISIS', 'am' => 'ኢዩሲስ']]);
+    $this->actingAs(User::factory()->admin()->create());
+
+    Livewire::test(EditProject::class, ['record' => $project->getRouteKey()])
+        ->assertSchemaStateSet(['title.en' => 'EUISIS', 'title.am' => 'ኢዩሲስ']);
+});
+
+it('saves the profile in both languages from the admin form', function (): void {
+    $profile = Profile::factory()->create(['headline' => 'Developer', 'bio' => ['First paragraph.']]);
+    $this->actingAs(User::factory()->admin()->create());
+
+    Livewire::test(EditProfile::class, ['record' => $profile->getRouteKey()])
+        ->assertSchemaStateSet(['headline.en' => 'Developer'])
+        ->fillForm([
+            'headline.am' => 'ገንቢ',
+            'bio.am' => [['paragraph' => 'የመጀመሪያ አንቀጽ።']],
+            'facts' => [['value' => '4', 'label' => ['en' => 'Projects', 'am' => 'ፕሮጀክቶች']]],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $profile->refresh();
+    expect($profile->getTranslations('headline'))->toBe(['en' => 'Developer', 'am' => 'ገንቢ'])
+        ->and($profile->getTranslations('bio'))->toBe(['en' => ['First paragraph.'], 'am' => ['የመጀመሪያ አንቀጽ።']])
+        ->and($profile->facts)->toBe([['value' => '4', 'label' => ['en' => 'Projects', 'am' => 'ፕሮጀክቶች']]]);
 });
 
 it('rejects a duplicate slug', function (): void {
@@ -70,7 +123,7 @@ it('rejects a duplicate slug', function (): void {
     $this->actingAs(User::factory()->admin()->create());
 
     Livewire::test(CreateProject::class)
-        ->fillForm(['title' => 'X', 'slug' => 'taken', 'category' => 'software', 'summary' => 's', 'problem' => 'p', 'role' => 'r', 'solution' => 's', 'outcome' => 'o', 'stack' => ['PHP']])
+        ->fillForm(['title.en' => 'X', 'slug' => 'taken', 'category' => 'software', 'summary.en' => 's', 'problem.en' => 'p', 'role.en' => 'r', 'solution.en' => 's', 'outcome.en' => 'o', 'stack' => ['PHP']])
         ->call('create')
         ->assertHasFormErrors(['slug' => 'unique']);
 });

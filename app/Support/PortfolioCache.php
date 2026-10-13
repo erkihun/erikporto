@@ -61,7 +61,8 @@ final class PortfolioCache
 
     private static function key(string $key): string
     {
-        return sprintf('portfolio:v%d:%s', self::version(), $key);
+        // Payloads contain translated text, so each locale has its own entry.
+        return sprintf('portfolio:v%d:%s:%s', self::version(), app()->getLocale(), $key);
     }
 
     private static function version(): int

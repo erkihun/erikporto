@@ -1,6 +1,7 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { useState, type FormEvent } from 'react';
 
+import { useTrans } from '@/hooks/useTrans';
 import type { InquiryType, Option, Profile } from '@/types/portfolio';
 
 import { ArrowRight } from '../ui/icons';
@@ -14,6 +15,8 @@ interface ContactForm {
 }
 
 export function ContactSection({ profile, inquiryTypes }: { profile: Profile; inquiryTypes: Option<InquiryType>[] }) {
+    const t = useTrans();
+    const { urls } = usePage().props;
     const [copied, setCopied] = useState(false);
     const [sent, setSent] = useState(false);
     const form = useForm<ContactForm>({
@@ -26,7 +29,7 @@ export function ContactSection({ profile, inquiryTypes }: { profile: Profile; in
 
     const submit = (e: FormEvent) => {
         e.preventDefault();
-        form.post('/contact', {
+        form.post(urls.contact, {
             preserveScroll: true,
             onSuccess: () => {
                 form.reset();
@@ -50,20 +53,20 @@ export function ContactSection({ profile, inquiryTypes }: { profile: Profile; in
         <section className="block wrap" id="contact">
             <div className="contact rv">
                 <div>
-                    <span className="kicker mono" style={{ color: 'var(--paper)' }}>Contact</span>
-                    <h2>Let’s build something that lasts.</h2>
-                    <p className="sub">Tell me about the system or the brand you need. I usually reply within two working days.</p>
+                    <span className="kicker mono" style={{ color: 'var(--paper)' }}>{t('contact.kicker')}</span>
+                    <h2>{t('contact.title')}</h2>
+                    <p className="sub">{t('contact.intro')}</p>
                     <div className="chan">
                         {profile.email ? (
                             <button type="button" onClick={copyEmail}>
-                                <span>Email</span>
-                                <span>{copied ? 'Copied ✓' : `${profile.email} ⧉`}</span>
+                                <span>{t('contact.email')}</span>
+                                <span>{copied ? t('contact.copied') : `${profile.email} ⧉`}</span>
                             </button>
                         ) : null}
                         {profile.social_links.map((link) => (
                             <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer">
                                 <span>{link.label}</span>
-                                <span>{link.handle ?? 'Open'} ↗</span>
+                                <span>{link.handle ?? t('contact.open')} ↗</span>
                             </a>
                         ))}
                     </div>
@@ -71,34 +74,34 @@ export function ContactSection({ profile, inquiryTypes }: { profile: Profile; in
 
                 {sent ? (
                     <div className="sent" role="status">
-                        <span className="kicker mono" style={{ color: 'var(--paper)' }}>Sent</span>
-                        <h3 style={{ fontSize: 32, fontStretch: '85%' }}>Thank you.</h3>
-                        <p style={{ opacity: 0.75, marginTop: 10 }}>Your message is on its way. I’ll reply within two working days.</p>
+                        <span className="kicker mono" style={{ color: 'var(--paper)' }}>{t('contact.sent_kicker')}</span>
+                        <h3 style={{ fontSize: 32, fontStretch: '85%' }}>{t('contact.sent_title')}</h3>
+                        <p style={{ opacity: 0.75, marginTop: 10 }}>{t('contact.sent_text')}</p>
                     </div>
                 ) : (
                     <form className="cf" onSubmit={submit} noValidate>
                         <div className="two">
-                            <Field id="name" label="Name" error={form.errors.name}>
+                            <Field id="name" label={t('contact.form.name')} error={form.errors.name}>
                                 <input id="name" autoComplete="name" required maxLength={120} value={form.data.name} onChange={(e) => form.setData('name', e.currentTarget.value)} aria-invalid={!!form.errors.name} />
                             </Field>
-                            <Field id="email" label="Email" error={form.errors.email}>
+                            <Field id="email" label={t('contact.form.email')} error={form.errors.email}>
                                 <input id="email" type="email" autoComplete="email" required maxLength={190} value={form.data.email} onChange={(e) => form.setData('email', e.currentTarget.value)} aria-invalid={!!form.errors.email} />
                             </Field>
                         </div>
-                        <Field id="inquiry_type" label="Project type" error={form.errors.inquiry_type}>
+                        <Field id="inquiry_type" label={t('contact.form.type')} error={form.errors.inquiry_type}>
                             <select id="inquiry_type" value={form.data.inquiry_type} onChange={(e) => form.setData('inquiry_type', e.currentTarget.value as InquiryType)}>
                                 {inquiryTypes.map((o) => (
                                     <option key={o.value} value={o.value}>{o.label}</option>
                                 ))}
                             </select>
                         </Field>
-                        <Field id="message" label="Message" error={form.errors.message}>
+                        <Field id="message" label={t('contact.form.message')} error={form.errors.message}>
                             <textarea id="message" rows={5} required minLength={20} maxLength={5000} value={form.data.message} onChange={(e) => form.setData('message', e.currentTarget.value)} aria-invalid={!!form.errors.message} />
                         </Field>
                         <input className="hp" tabIndex={-1} autoComplete="off" name="website" aria-hidden="true" value={form.data.website} onChange={(e) => form.setData('website', e.currentTarget.value)} />
                         <div>
                             <button className="btn btn-primary" type="submit" disabled={form.processing}>
-                                {form.processing ? 'Sending…' : 'Send message'} <ArrowRight />
+                                {form.processing ? t('contact.form.sending') : t('contact.form.send')} <ArrowRight />
                             </button>
                         </div>
                     </form>

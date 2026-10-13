@@ -14,8 +14,8 @@ enum ExperienceType: string implements HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::Work => 'Work',
-            self::Education => 'Education',
+            self::Work => __('enums.experience.work'),
+            self::Education => __('enums.experience.education'),
         };
     }
 }

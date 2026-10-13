@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProcessSteps;
 
+use App\Enums\Locale;
 use App\Filament\Resources\ProcessSteps\Pages\ManageProcessSteps;
+use App\Filament\Support\LocaleTabs;
 use App\Models\ProcessStep;
 use App\Support\PortfolioCache;
 use BackedEnum;
@@ -34,8 +36,10 @@ final class ProcessStepResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('title')->required()->maxLength(80),
-            Textarea::make('description')->required()->maxLength(300)->rows(3)->columnSpanFull(),
+            LocaleTabs::make('Step', static fn (Locale $locale, bool $required): array => [
+                TextInput::make(LocaleTabs::path('title', $locale))->label('Title')->required($required)->maxLength(80),
+                Textarea::make(LocaleTabs::path('description', $locale))->label('Description')->required($required)->maxLength(300)->rows(3),
+            ]),
         ]);
     }
 

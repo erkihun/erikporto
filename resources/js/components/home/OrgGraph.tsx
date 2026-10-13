@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { useTrans } from '@/hooks/useTrans';
 import { whenIdle } from '@/lib/idle';
 import type { GraphMode, OrgGraphEngine } from '@/lib/org-graph-engine';
+import type { TransKey } from '@/types/inertia';
 
-const MODE_COPY: Record<GraphMode, { label: string; caption: string }> = {
-    system: { label: 'org.structure → 40 nodes', caption: '1 bureau · 3 dirs · 9 teams · 27 staff' },
-    design: { label: 'identity.construct → grid', caption: 'circle · triangle · baseline grid' },
+const MODE_COPY: Record<GraphMode, { label: TransKey; caption: TransKey; button: TransKey }> = {
+    system: { label: 'graph.system_label', caption: 'graph.system_caption', button: 'graph.system' },
+    design: { label: 'graph.design_label', caption: 'graph.design_caption', button: 'graph.design' },
 };
 
 /**
@@ -14,6 +16,7 @@ const MODE_COPY: Record<GraphMode, { label: string; caption: string }> = {
  * so it never delays rendering or LCP.
  */
 export function OrgGraph() {
+    const t = useTrans();
     const stageRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const engineRef = useRef<OrgGraphEngine | null>(null);
@@ -62,18 +65,18 @@ export function OrgGraph() {
         <div className="stage" ref={stageRef}>
             <canvas ref={canvasRef} aria-hidden="true" />
             <div className="hud top mono">
-                <span>{MODE_COPY[mode].label}</span>
-                <div className="mode" role="group" aria-label="Animation mode">
+                <span>{t(MODE_COPY[mode].label)}</span>
+                <div className="mode" role="group" aria-label={t('graph.mode')}>
                     {(['system', 'design'] as const).map((m) => (
                         <button key={m} type="button" aria-pressed={mode === m} onClick={() => select(m, true)}>
-                            {m === 'system' ? 'System' : 'Design'}
+                            {t(MODE_COPY[m].button)}
                         </button>
                     ))}
                 </div>
             </div>
             <div className="hud bot mono">
-                <span>{MODE_COPY[mode].caption}</span>
-                <span>move cursor to interact</span>
+                <span>{t(MODE_COPY[mode].caption)}</span>
+                <span>{t('graph.hint')}</span>
             </div>
         </div>
     );

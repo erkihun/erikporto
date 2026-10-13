@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Locale;
 use App\Models\Profile;
 use App\Support\Fonts;
 use Illuminate\Support\Facades\Vite;
@@ -28,6 +29,14 @@ it('preloads every first-view font file', function (): void {
         $name = pathinfo($font, PATHINFO_FILENAME);
         expect($html)->toMatch('/<link rel="preload" href="[^"]+'.preg_quote($name, '/').'-[^"]+\.woff2" as="font" type="font\/woff2" crossorigin>/');
     }
+});
+
+it('preloads the Amharic syllabary on Amharic pages only', function (): void {
+    $pattern = '/<link rel="preload" href="[^"]+ethiopic-amharic-[^"]+\.woff2"/';
+
+    expect($this->get('/')->getContent())->not->toMatch($pattern)
+        ->and($this->get('/am')->getContent())->toMatch($pattern)
+        ->and(Fonts::firstView(Locale::Am))->toHaveCount(6);
 });
 
 it('preloads the self-hosted display face and loads nothing from Google Fonts', function (): void {

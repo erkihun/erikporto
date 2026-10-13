@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Contracts\AnnouncesOnTelegram;
 use App\Enums\ProjectCategory;
 use App\Models\Concerns\FlushesPortfolioCache;
+use App\Models\Concerns\HasLocalizedContent;
 use App\Models\Concerns\QueuesTelegramAnnouncement;
 use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -26,7 +27,10 @@ use Illuminate\Support\Carbon;
 final class Project extends Model implements AnnouncesOnTelegram
 {
     /** @use HasFactory<ProjectFactory> */
-    use FlushesPortfolioCache, HasFactory, QueuesTelegramAnnouncement;
+    use FlushesPortfolioCache, HasFactory, HasLocalizedContent, QueuesTelegramAnnouncement;
+
+    /** @var list<string> English and Amharic per field; the slug, URLs, tags and enums are not translated. */
+    public array $translatable = ['title', 'subtitle', 'summary', 'problem', 'role', 'solution', 'outcome'];
 
     public const TELEGRAM_TOGGLE = 'announce_projects';
 

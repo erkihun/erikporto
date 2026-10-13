@@ -334,3 +334,15 @@ footer{position:relative;z-index:1;padding-block:40px 56px;color:var(--muted)}
 .now-history details{border-bottom:1px solid var(--line)}
 .now-history details .prose{padding:0 0 24px 174px}
 @media (max-width:700px){.now-history summary{grid-template-columns:minmax(0,1fr) auto;gap:8px}.now-history summary .note-date{grid-column:1/-1}.now-history details .prose{padding-left:0}}
+
+/* ---- Language ---- */
+.lang{display:flex;gap:4px}
+.lang .chip{padding:6px 10px;font-size:12px;text-decoration:none;line-height:1.4}
+.lang .chip[aria-current="page"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.lang .chip:lang(am){font-family:var(--f-eth)}
+/* Amharic pages: Ethiopic glyphs from Noto Sans Ethiopic, Latin from the usual faces (unicode-range keeps them apart). */
+html[lang="am"]{
+  --f-body:"Noto Sans Ethiopic","IBM Plex Sans","IBM Plex Sans Fallback",system-ui,sans-serif;
+  --f-display:"Archivo","Noto Sans Ethiopic","Archivo Fallback","Arial Narrow",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono","Noto Sans Ethiopic","JetBrains Mono Fallback",ui-monospace,monospace;
+}

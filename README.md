@@ -32,7 +32,8 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 
 | Concern | Where |
 | --- | --- |
-| Routes | `routes/web.php`: `/`, `/work/{slug}`, `/notes`, `/notes/{slug}`, `/feed.xml`, `/now`, `POST /contact`, `/cv`, `/sitemap.xml` |
+| Routes | `routes/web.php`: `/`, `/work/{slug}` and `POST /contact` in English, the same under `/am` in Amharic; `/notes`, `/notes/{slug}`, `/feed.xml`, `/now`, `/cv`, `/sitemap.xml` in one language |
+| Languages | English (default) and Amharic. Content columns are `{"en": …, "am": …}` JSON (spatie/laravel-translatable via `HasLocalizedContent`); the admin forms have an English tab (required) and an አማርኛ tab (optional, blank falls back to English). UI strings live in `lang/en.json` and `lang/am.json` (same keys, enforced by a test). Notes and /now are written in one language |
 | Notes | `App\Models\Note` (state derived from `published_at`), Markdown rendered safely on save by `App\Support\Markdown\MarkdownRenderer` |
 | Telegram | `AnnounceOnTelegram` job (idempotent) + `portfolio:announce` every 5 minutes; disabled until `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHANNEL_ID` are set |
 | Now page | `/now` shows the newest published `App\Models\NowUpdate` (Markdown via the same `MarkdownRenderer`); older updates collapse below as history. Edited in **Admin → Content → Now**; not announced on Telegram |
@@ -55,7 +56,8 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 ## Production checklist
 - Production seeds only the admin user (`php artisan db:seed --force`). The home page shows a "coming soon" page until the profile is filled in at /admin.
 - `APP_ENV=production`, `APP_DEBUG=false` and the real `APP_URL`
-- MySQL configured in `.env` (the migrations work on both SQLite and MySQL)
+- MySQL 8 configured in `.env` (the migrations work on SQLite and MySQL; CI runs the suite on both)
+- Amharic UI strings in `lang/am.json` and the demo content are drafts: have a native speaker review them (search for `TODO(review-am)`)
 - A mail driver, plus a queue worker under Supervisor
 - The scheduler cron (`* * * * * php artisan schedule:run`) so scheduled notes are announced on Telegram
 - Telegram (optional): create a bot with @BotFather, add it as an admin of your channel, set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHANNEL_ID`

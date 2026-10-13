@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\ExperienceType;
 use App\Models\Concerns\FlushesPortfolioCache;
+use App\Models\Concerns\HasLocalizedContent;
 use Database\Factories\ExperienceFactory;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,22 +22,26 @@ use Illuminate\Support\Carbon;
 final class Experience extends Model
 {
     /** @use HasFactory<ExperienceFactory> */
-    use FlushesPortfolioCache, HasFactory;
+    use FlushesPortfolioCache, HasFactory, HasLocalizedContent;
+
+    /** @var list<string> English and Amharic per field; the slug, URLs, tags and enums are not translated. */
+    public array $translatable = ['title', 'organization', 'location', 'description'];
 
     protected $fillable = [
         'type', 'title', 'organization', 'location', 'starts_on', 'ends_on', 'description', 'sort_order',
     ];
 
-    /** Human period such as "Mar 2022 — Present"; null when no dates were entered. */
+    /** Human period in the current locale, such as "Mar 2022 — Present"; null when no dates were entered. */
     public function period(): ?string
     {
         if ($this->starts_on === null) {
             return $this->ends_on?->format('Y');
         }
 
-        $end = $this->ends_on?->format('M Y') ?? 'Present';
+        $month = static fn (Carbon $date): string => $date->locale(app()->getLocale())->translatedFormat('M Y');
+        $end = $this->ends_on !== null ? $month($this->ends_on) : __('experience.present');
 
-        return $this->starts_on->format('M Y').' — '.$end;
+        return $month($this->starts_on).' — '.$end;
     }
 
     /** @param Builder<self> $query */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\FlushesPortfolioCache;
+use App\Models\Concerns\HasLocalizedContent;
 use Database\Factories\ProfileFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +20,10 @@ use Illuminate\Database\Eloquent\Model;
 final class Profile extends Model
 {
     /** @use HasFactory<ProfileFactory> */
-    use FlushesPortfolioCache, HasFactory;
+    use FlushesPortfolioCache, HasFactory, HasLocalizedContent;
+
+    /** @var list<string> English and Amharic per field; the slug, URLs, tags and enums are not translated. */
+    public array $translatable = ['headline', 'lede', 'bio', 'about_statement', 'location', 'meta_description'];
 
     protected $fillable = [
         'name', 'headline', 'lede', 'bio', 'about_statement', 'location', 'email',
@@ -34,7 +38,6 @@ final class Profile extends Model
     protected function casts(): array
     {
         return [
-            'bio' => 'array',
             'social_links' => 'array',
             'facts' => 'array',
             'is_available' => 'boolean',

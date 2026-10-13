@@ -4,19 +4,22 @@ import { SiteLayout } from '@/components/layout/SiteLayout';
 import { NoteCard } from '@/components/notes/NoteCard';
 import { ArrowLeft, ArrowRight } from '@/components/ui/icons';
 import { Seo } from '@/components/ui/Seo';
+import { useTrans } from '@/hooks/useTrans';
 import type { NotesIndexProps } from '@/types/portfolio';
 
 export default function NotesIndex({ notes, pagination, owner }: NotesIndexProps) {
+    const t = useTrans();
+
     return (
         <SiteLayout ownerName={owner.name ?? 'Portfolio'}>
-            <Seo title="Notes" description="Short, practical write-ups on Laravel, Filament, Amharic interfaces and the Ethiopian calendar." />
+            <Seo title={t('notes.index_title')} description={t('notes.description')} />
             <div className="wrap page-enter">
                 <header className="cs-hero">
-                    <span className="kicker mono">Notes · RSS available</span>
-                    <h1>Notes</h1>
-                    <p className="sub">Short, practical write-ups from the systems I build.</p>
+                    <span className="kicker mono">{t('notes.index_kicker')}</span>
+                    <h1>{t('notes.index_title')}</h1>
+                    <p className="sub">{t('notes.index_intro')}</p>
                     <div>
-                        <a className="btn btn-ghost btn-sm" href="/feed.xml">Subscribe via RSS</a>
+                        <a className="btn btn-ghost btn-sm" href="/feed.xml">{t('notes.subscribe')}</a>
                     </div>
                 </header>
 
@@ -27,19 +30,19 @@ export default function NotesIndex({ notes, pagination, owner }: NotesIndexProps
                         ))}
                     </div>
                 ) : (
-                    <p className="notice" style={{ marginBottom: 96 }}>The first notes are being written. Subscribe to the feed to get them when they’re out.</p>
+                    <p className="notice" style={{ marginBottom: 96 }}>{t('notes.empty')}</p>
                 )}
 
                 {pagination.prev || pagination.next ? (
-                    <nav className="pager" aria-label="Pagination">
+                    <nav className="pager" aria-label={t('notes.pagination')}>
                         {pagination.prev ? (
                             <Link className="btn btn-ghost btn-sm" href={pagination.prev} rel="prev">
-                                <ArrowLeft /> Newer
+                                <ArrowLeft /> {t('notes.newer')}
                             </Link>
                         ) : <span />}
                         {pagination.next ? (
                             <Link className="btn btn-ghost btn-sm" href={pagination.next} rel="next">
-                                Older <ArrowRight />
+                                {t('notes.older')} <ArrowRight />
                             </Link>
                         ) : null}
                     </nav>

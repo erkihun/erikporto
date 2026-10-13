@@ -29,7 +29,7 @@ final class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('contact', static function (Request $request): array {
             $tooMany = static fn () => back()->withErrors([
-                'message' => 'Too many messages from your connection. Please try again later.',
+                'message' => __('contact.validation.rate_limited'),
             ]);
 
             return [

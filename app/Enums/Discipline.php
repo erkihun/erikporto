@@ -14,16 +14,16 @@ enum Discipline: string implements HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::Engineering => 'Engineering',
-            self::Design => 'Design',
+            self::Engineering => __('enums.discipline.engineering'),
+            self::Design => __('enums.discipline.design'),
         };
     }
 
     public function tagline(): string
     {
         return match ($this) {
-            self::Engineering => 'Laravel · PHP',
-            self::Design => 'Brand · UI',
+            self::Engineering => __('enums.discipline.engineering_tagline'),
+            self::Design => __('enums.discipline.design_tagline'),
         };
     }
 }

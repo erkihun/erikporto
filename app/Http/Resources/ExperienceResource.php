@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\Experience;
+use App\Support\Localized;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,9 +23,9 @@ final class ExperienceResource extends JsonResource
             'type_label' => $this->type->getLabel(),
             'title' => $this->title,
             'organization' => $this->organization,
-            'location' => $this->location,
+            'location' => Localized::text($this->location),
             'period' => $this->period(),
-            'description' => $this->description,
+            'description' => Localized::text($this->description),
         ];
     }
 }

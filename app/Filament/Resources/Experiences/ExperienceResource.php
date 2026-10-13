@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Experiences;
 
 use App\Enums\ExperienceType;
+use App\Enums\Locale;
 use App\Filament\Resources\Experiences\Pages\ManageExperiences;
+use App\Filament\Support\LocaleTabs;
 use App\Models\Experience;
 use App\Support\PortfolioCache;
 use BackedEnum;
@@ -40,9 +42,6 @@ final class ExperienceResource extends Resource
     {
         return $schema->columns(2)->components([
             Select::make('type')->options(ExperienceType::class)->required()->default(ExperienceType::Work),
-            TextInput::make('title')->label('Role or degree')->required()->maxLength(140),
-            TextInput::make('organization')->label('Organisation or school')->required()->maxLength(160),
-            TextInput::make('location')->maxLength(120),
             DatePicker::make('starts_on')->label('Start')->native(false)->displayFormat('M Y'),
             DatePicker::make('ends_on')
                 ->label('End')
@@ -50,7 +49,12 @@ final class ExperienceResource extends Resource
                 ->displayFormat('M Y')
                 ->afterOrEqual('starts_on')
                 ->helperText('Leave empty if ongoing.'),
-            Textarea::make('description')->rows(3)->maxLength(1000)->columnSpanFull(),
+            LocaleTabs::make('Details', static fn (Locale $locale, bool $required): array => [
+                TextInput::make(LocaleTabs::path('title', $locale))->label('Role or degree')->required($required)->maxLength(140),
+                TextInput::make(LocaleTabs::path('organization', $locale))->label('Organisation or school')->required($required)->maxLength(160),
+                TextInput::make(LocaleTabs::path('location', $locale))->label('Location')->maxLength(120),
+                Textarea::make(LocaleTabs::path('description', $locale))->label('Description')->rows(3)->maxLength(1000),
+            ]),
         ]);
     }
 
