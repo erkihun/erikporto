@@ -13,7 +13,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: intl, pdo_sqlite
+          extensions: intl, pdo_sqlite, gd, zip
           coverage: none
       - uses: actions/setup-node@v4
         with:
@@ -22,6 +22,35 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
       - run: npm ci
       - run: npm run build
+      - name: Byte budgets (initial JS, CSS, first-view fonts)
+        run: npm run budgets
       - run: cp .env.example .env && php artisan key:generate
       - run: vendor/bin/pint --test
       - run: php artisan test
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, pdo_sqlite, gd, zip, opcache
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
+      - run: npm ci
+      - run: npm run build
+      - run: cp .env.example .env && php artisan key:generate
+      - name: Lighthouse CI (mobile, budgets in lighthouserc.cjs)
+        run: npx lhci autorun
+      - name: Keep the reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 30

@@ -10,8 +10,10 @@
             try { var t = localStorage.getItem('eb-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
             document.documentElement.classList.add('js');
         </script>
-        {{-- Self-hosted fonts (resources/css/fonts.css). The display face sets the hero name, the LCP element. --}}
-        <link rel="preload" href="{{ Vite::asset('resources/fonts/archivo-latin-critical.woff2') }}" as="font" type="font/woff2" crossorigin>
+        {{-- Self-hosted fonts (resources/css/fonts.css): the first-view files download alongside the HTML. --}}
+        @foreach (\App\Support\Fonts::firstView() as $font)
+            <link rel="preload" href="{{ Vite::asset($font) }}" as="font" type="font/woff2" crossorigin>
+        @endforeach
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="alternate" type="application/xml" href="{{ route('sitemap') }}">
         @if (Vite::isRunningHot())

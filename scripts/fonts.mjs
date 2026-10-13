@@ -16,8 +16,6 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import archivoMetrics from '@capsizecss/metrics/archivo';
-import arialMetrics from '@capsizecss/metrics/arial';
-import courierNewMetrics from '@capsizecss/metrics/courierNew';
 import ibmPlexSansMetrics from '@capsizecss/metrics/ibmPlexSans';
 import jetBrainsMonoMetrics from '@capsizecss/metrics/jetBrainsMono';
 import subsetFont from 'subset-font';
@@ -30,8 +28,14 @@ const fontsource = (pkg) => join(root, 'node_modules/@fontsource-variable', pkg)
 /** ASCII symbols that copy rarely uses; they live in the on-demand "rest" file. */
 const RARE_ASCII = '$*<=>[\\]^_`{|}~';
 
-/** ASCII (minus the rare symbols) plus the typographic characters used in the UI and likely in copy. */
+/**
+ * ASCII (minus the rare symbols) plus the typographic characters used in the UI and likely in copy.
+ * Control characters are included too: they have no glyphs, but Markdown soft line breaks leave a
+ * U+000A in paragraph text and the browser matches it against unicode-range, which would otherwise
+ * download a whole extra file just for a newline.
+ */
 const CRITICAL_LATIN = [
+    [0x00, 0x1f], [0x7f, 0x9f],
     ...Array.from({ length: 0x7e - 0x20 + 1 }, (_, i) => 0x20 + i).filter((cp) => !RARE_ASCII.includes(String.fromCodePoint(cp))),
     0xa0, 0xa9, 0xb7, 0xd7, 0x2013, 0x2014, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2026,
     [0x2190, 0x2193], 0x2197, 0x2713, 0x29c9,
@@ -52,7 +56,6 @@ const FAMILIES = [
         // wght starts at 300 like the previously loaded Google font, so weight 200 keeps rendering as 300.
         axes: { wght: { min: 300, max: 800 }, wdth: { min: 62, max: 125 } },
         descriptors: { 'font-weight': '300 800', 'font-stretch': '62% 125%' },
-        fallback: { name: 'Archivo Fallback', local: ['Arial', 'Liberation Sans'], metrics: archivoMetrics, base: arialMetrics },
         preload: true,
     },
     {
@@ -62,7 +65,6 @@ const FAMILIES = [
         css: 'index.css',
         axes: { wght: { min: 400, max: 600 } },
         descriptors: { 'font-weight': '400 600' },
-        fallback: { name: 'IBM Plex Sans Fallback', local: ['Arial', 'Liberation Sans'], metrics: ibmPlexSansMetrics, base: arialMetrics },
     },
     {
         family: 'JetBrains Mono',
@@ -71,7 +73,6 @@ const FAMILIES = [
         css: 'index.css',
         axes: { wght: { min: 400, max: 500 } },
         descriptors: { 'font-weight': '400 500' },
-        fallback: { name: 'JetBrains Mono Fallback', local: ['Courier New', 'Liberation Mono'], metrics: jetBrainsMonoMetrics, base: courierNewMetrics },
         // Code blocks in notes use every ASCII symbol, so the mono face keeps all of ASCII on
         // first view. Programming ligatures are left out (plain code, and they would triple the file).
         criticalAscii: 'all',
@@ -146,12 +147,24 @@ const face = (font, { file, range }) => {
     return `@font-face {\n    font-family: '${font.family}';\n    src: url('../fonts/${file}') format('woff2');\n${descriptors}    font-style: normal;\n    font-display: swap;\n    unicode-range: ${range};\n}\n`;
 };
 
-/** size-adjust and ascent/descent/line-gap overrides that make the local fallback occupy the web font's space. */
-const fallbackFace = ({ name, local, metrics, base }) => {
-    const sizeAdjust = metrics.xWidthAvg / metrics.unitsPerEm / (base.xWidthAvg / base.unitsPerEm);
+/**
+ * Local fallback faces per weight/stretch range (measured by scripts/measure-font-fallbacks.mjs into
+ * scripts/font-fallbacks.json): size-adjust makes the local font run as wide as the web font, and the
+ * ascent/descent/line-gap overrides give it the web font's line box, so the swap moves nothing.
+ */
+const METRICS = { Archivo: archivoMetrics, 'IBM Plex Sans': ibmPlexSansMetrics, 'JetBrains Mono': jetBrainsMonoMetrics };
+const LOCALS = {
+    Arial: { regular: ['Arial', 'ArialMT', 'Liberation Sans'], bold: ['Arial Bold', 'Arial-BoldMT', 'Liberation Sans Bold'] },
+    'Courier New': { regular: ['Courier New', 'CourierNewPSMT', 'Liberation Mono'], bold: ['Courier New Bold', 'CourierNewPS-BoldMT', 'Liberation Mono Bold'] },
+};
+const fallbackFace = ({ family, local: localFamily, weight, stretch, sizeAdjust }) => {
+    const metrics = METRICS[family];
     const em = metrics.unitsPerEm * sizeAdjust;
+    const local = LOCALS[localFamily][weight[0] >= 600 ? 'bold' : 'regular'];
+    const name = `${family} Fallback`;
     const pct = (n) => `${(n * 100).toFixed(2)}%`;
-    return `@font-face {\n    font-family: '${name}';\n    src: ${local.map((l) => `local('${l}')`).join(', ')};\n    size-adjust: ${pct(sizeAdjust)};\n    ascent-override: ${pct(metrics.ascent / em)};\n    descent-override: ${pct(Math.abs(metrics.descent) / em)};\n    line-gap-override: ${pct(metrics.lineGap / em)};\n}\n`;
+    const range = `    font-weight: ${weight[0]} ${weight[1]};\n${stretch ? `    font-stretch: ${stretch[0]}% ${stretch[1]}%;\n` : ''}`;
+    return `@font-face {\n    font-family: '${name}';\n    src: ${local.map((l) => `local('${l}')`).join(', ')};\n${range}    size-adjust: ${pct(sizeAdjust)};\n    ascent-override: ${pct(metrics.ascent / em)};\n    descent-override: ${pct(Math.abs(metrics.descent) / em)};\n    line-gap-override: ${pct(metrics.lineGap / em)};\n}\n`;
 };
 
 await mkdir(fontsDir, { recursive: true });
@@ -181,10 +194,11 @@ for (const font of FAMILIES) {
     faces.push(face(font, criticalFace));
     faces.push(face(font, await build(font, 'latin-rest', map.latin.file, rest)));
     faces.push(face(font, await build(font, 'latin-ext', map['latin-ext'].file, map['latin-ext'].codePoints.filter((cp) => !inLatin.includes(cp)))));
-    fallbacks.push(fallbackFace(font.fallback));
     if (font.preload) preloads.push(`resources/fonts/${criticalFace.file}`);
 }
 
-const header = `/*\n * Generated by scripts/fonts.mjs. Do not edit by hand: change the script and run \`npm run fonts\`.\n * Preloaded in app.blade.php: ${preloads.join(', ')}\n */\n`;
+for (const entry of JSON.parse(await readFile(join(root, 'scripts/font-fallbacks.json'), 'utf8'))) fallbacks.push(fallbackFace(entry));
+
+const header = `/*\n * Generated by scripts/fonts.mjs. Do not edit by hand: change the script and run \`npm run fonts\`.\n * First-view files (latin-critical, ethiopic-core, date-latin) are preloaded by App\\Support\\Fonts.\n */\n`;
 await writeFile(cssFile, `${header}\n${faces.join('\n')}\n/* Metric-matched local fallbacks: the swap to the web font causes no layout shift. */\n${fallbacks.join('\n')}`);
 console.log(`\nwrote ${cssFile.replace(root + '\\', '').replace(root + '/', '')}`);

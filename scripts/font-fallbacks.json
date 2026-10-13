@@ -1,0 +1,106 @@
+[
+    {
+        "family": "Archivo",
+        "local": "Arial",
+        "weight": [
+            300,
+            599
+        ],
+        "stretch": [
+            62,
+            95
+        ],
+        "at": {
+            "weight": 500,
+            "stretch": 88
+        },
+        "sizeAdjust": 0.9027
+    },
+    {
+        "family": "Archivo",
+        "local": "Arial",
+        "weight": [
+            600,
+            800
+        ],
+        "stretch": [
+            62,
+            95
+        ],
+        "at": {
+            "weight": 800,
+            "stretch": 80
+        },
+        "sizeAdjust": 0.8543
+    },
+    {
+        "family": "Archivo",
+        "local": "Arial",
+        "weight": [
+            300,
+            599
+        ],
+        "stretch": [
+            96,
+            125
+        ],
+        "at": {
+            "weight": 500,
+            "stretch": 100
+        },
+        "sizeAdjust": 1.0033
+    },
+    {
+        "family": "Archivo",
+        "local": "Arial",
+        "weight": [
+            600,
+            800
+        ],
+        "stretch": [
+            96,
+            125
+        ],
+        "at": {
+            "weight": 700,
+            "stretch": 110
+        },
+        "sizeAdjust": 1.091
+    },
+    {
+        "family": "IBM Plex Sans",
+        "local": "Arial",
+        "weight": [
+            400,
+            549
+        ],
+        "at": {
+            "weight": 400
+        },
+        "sizeAdjust": 1.0104
+    },
+    {
+        "family": "IBM Plex Sans",
+        "local": "Arial",
+        "weight": [
+            550,
+            600
+        ],
+        "at": {
+            "weight": 600
+        },
+        "sizeAdjust": 0.9731
+    },
+    {
+        "family": "JetBrains Mono",
+        "local": "Courier New",
+        "weight": [
+            400,
+            500
+        ],
+        "at": {
+            "weight": 400
+        },
+        "sizeAdjust": 0.9998
+    }
+]

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\Profile;
+use App\Support\Fonts;
 use Illuminate\Support\Facades\Vite;
 
 beforeEach(function (): void {
@@ -16,6 +17,17 @@ it('inlines the stylesheet instead of linking it', function (): void {
 
     expect($html)->toContain('<style>')
         ->and($html)->not->toMatch('/<link[^>]+rel="stylesheet"/');
+});
+
+it('preloads every first-view font file', function (): void {
+    $html = $this->get('/')->assertOk()->getContent();
+
+    expect(Fonts::firstView())->toHaveCount(5);
+
+    foreach (Fonts::firstView() as $font) {
+        $name = pathinfo($font, PATHINFO_FILENAME);
+        expect($html)->toMatch('/<link rel="preload" href="[^"]+'.preg_quote($name, '/').'-[^"]+\.woff2" as="font" type="font\/woff2" crossorigin>/');
+    }
 });
 
 it('preloads the self-hosted display face and loads nothing from Google Fonts', function (): void {

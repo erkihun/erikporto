@@ -63,6 +63,17 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 - `php artisan optimize` and `php artisan filament:optimize` on each deploy
 - Real screenshots uploaded in **Admin → Projects → Media** to replace the illustrated placeholders
 
+## Performance
+
+Budgets (mobile): initial JS ≤ 100 KB gzip per page, CSS ≤ 20 KB gzip (inlined), first-view fonts ≤ 100 KB, CLS ≤ 0.02, TBT ≤ 100 ms, Accessibility / Best Practices / SEO 100.
+
+```bash
+npm run build && npm run budgets   # exact byte budgets from the production build
+npm run perf                       # Lighthouse CI: 4 pages × 3 runs, simulated Slow 4G
+```
+
+`npm run perf` starts `scripts/perf-server.mjs`: a fresh SQLite database seeded by `LighthouseSeeder`, isolated config/route/view caches, PHP with opcache and gzip, the SSR server, and an HTTP/2 + TLS front (production serves HTTP/2; Lighthouse's network model treats HTTP/1.1 very differently). The CI `lighthouse` job runs the same thing and keeps the reports as an artifact.
+
 ## Tests
 
 ```bash
