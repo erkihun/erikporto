@@ -98,6 +98,10 @@ export default function ColophonPage({ colophon, owner }: ColophonPageProps) {
                     </Block>
                 ) : null}
 
+                <Block label={t('colophon.a11y')}>
+                    <p>{t('colophon.a11y_text')}</p>
+                </Block>
+
                 <Block label={t('colophon.privacy')}>
                     <p>{t('colophon.privacy_text')}</p>
                 </Block>

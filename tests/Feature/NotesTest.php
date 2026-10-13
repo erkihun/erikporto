@@ -6,6 +6,7 @@ use App\Enums\NoteStatus;
 use App\Models\Note;
 use App\Models\Profile;
 use Illuminate\Database\Eloquent\MassAssignmentException;
+use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(fn () => Profile::factory()->create(['name' => 'Erkihun Bewket']));
@@ -124,4 +125,18 @@ it('adds published notes to the sitemap', function (): void {
         ->assertSee('/notes/in-sitemap', false)
         ->assertSee('/notes</loc>', false)
         ->assertDontSee('not-in-sitemap', false);
+});
+
+it('makes code blocks reachable by keyboard, and re-renders stored notes on demand', function (): void {
+    $note = Note::factory()->create(['body' => "```php\necho 1;\n```"]);
+    expect($note->body_html)->toContain('<pre tabindex="0"><code class="language-php">');
+
+    DB::table('notes')->where('id', $note->id)->update(['body_html' => '<p>stale</p>']);
+    $updatedAt = $note->fresh()->updated_at;
+
+    $this->artisan('portfolio:render-markdown')->assertSuccessful();
+
+    $fresh = $note->fresh();
+    expect($fresh->body_html)->toContain('<pre tabindex="0">')
+        ->and($fresh->updated_at->equalTo($updatedAt))->toBeTrue();
 });

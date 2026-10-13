@@ -10,6 +10,7 @@ use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NowController;
+use App\Http\Controllers\PaletteController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,7 @@ $localized = static function (): void {
     Route::get('/', HomeController::class)->name('home');
     Route::get('/work/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::get('/colophon', ColophonController::class)->name('colophon');
+    Route::get('/palette.json', PaletteController::class)->name('palette');
     Route::post('/contact', [ContactMessageController::class, 'store'])
         ->middleware('throttle:contact')
         ->name('contact.store');

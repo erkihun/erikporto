@@ -110,12 +110,43 @@ jobs:
           path: .lighthouseci/
           retention-days: 30
 
+  # axe (WCAG 2.2 AA) on every page type in light and dark, desktop and mobile, plus the
+  # keyboard flows (skip link, command palette) and print: tests/Browser, playwright.config.ts.
+  a11y:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, pdo_sqlite, gd, zip, exif, opcache
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: cp .env.example .env && php artisan key:generate
+      - run: npx playwright test
+      - name: Keep the report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            storage/logs/playwright/
+            test-results/
+          retention-days: 14
+
   # The numbers the colophon shows: test count and Lighthouse scores of this green run,
   # published as the quality.json asset of the "quality" release (no commits to main).
   # deploy/deploy.sh downloads it into storage/app/quality.json.
   quality:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [test, mysql, lighthouse]
+    needs: [test, mysql, lighthouse, a11y]
     runs-on: ubuntu-latest
     permissions:
       contents: write

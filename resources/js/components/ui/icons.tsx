@@ -23,6 +23,13 @@ export const Sun = (p: IconProps) => (
     </svg>
 );
 
+export const Search = (p: IconProps) => (
+    <svg {...base} strokeWidth={2} strokeLinecap="round" {...p}>
+        <circle cx="11" cy="11" r="6.5" />
+        <path d="M16 16l4.5 4.5" />
+    </svg>
+);
+
 export function Monogram() {
     return (
         <svg viewBox="0 0 32 32" aria-hidden="true">

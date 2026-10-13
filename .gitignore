@@ -31,3 +31,6 @@ Thumbs.db
 # CI reports (scripts/quality-report.mjs)
 /junit.xml
 /quality.json
+# Playwright (tests/Browser)
+/test-results/
+/playwright-report/

@@ -205,3 +205,9 @@ export interface ColophonPageProps {
     colophon: Colophon;
     owner: Owner;
 }
+
+/** Mirrors App\Http\Controllers\PaletteController (GET urls.palette). */
+export interface PaletteData {
+    projects: { title: string; kind: string; url: string }[];
+    notes: { title: string; url: string }[];
+}

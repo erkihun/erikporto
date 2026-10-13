@@ -22,3 +22,11 @@ createInertiaApp({
 
 // Back/forward buttons get the reverse page transition (a capture-phase popstate listener).
 animateHistoryNavigation();
+
+// For whoever opens the console.
+console.info(
+    '%cHello, curious mind.%c\nLaravel, Inertia and Preact, server-rendered and measured in the colophon:',
+    'font: 600 15px system-ui, sans-serif; color: #2747F5',
+    'font: 13px system-ui, sans-serif',
+    new URL('/colophon', window.location.origin).href,
+);

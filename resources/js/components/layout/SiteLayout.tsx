@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ComponentType, type ReactNode } from 'react';
 
 import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
 import { useTheme } from '@/hooks/useTheme';
@@ -7,7 +7,7 @@ import { useTrans } from '@/hooks/useTrans';
 import { formatEthiopian } from '@/lib/ethiopian-calendar';
 import type { TransKey } from '@/types/inertia';
 
-import { Monogram, Sun } from '../ui/icons';
+import { Monogram, Search, Sun } from '../ui/icons';
 import { Toast } from '../ui/Toast';
 
 const SECTIONS: readonly (readonly [string, TransKey])[] = [
@@ -44,6 +44,27 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
 
     useEffect(() => setToast(flash.success ?? flash.error), [flash.success, flash.error]);
     const clearToast = useCallback(() => setToast(null), []);
+
+    // ⌘K / Ctrl+K: the command palette is its own chunk, loaded on first use.
+    const [Palette, setPalette] = useState<ComponentType<{ onClose: () => void }> | null>(null);
+    const [paletteOpen, setPaletteOpen] = useState(false);
+    const openPalette = useCallback(() => {
+        void import('../palette/CommandPalette').then((module) => {
+            setPalette(() => module.default);
+            setPaletteOpen(true);
+        });
+    }, []);
+    const closePalette = useCallback(() => setPaletteOpen(false), []);
+    useEffect(() => {
+        const onKey = (event: KeyboardEvent) => {
+            if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+                event.preventDefault();
+                openPalette();
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [openPalette]);
 
     // Dates are client-only so SSR markup never disagrees with the visitor's local day.
     useEffect(() => {
@@ -120,6 +141,9 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
                             </a>
                         ))}
                     </nav>
+                    <button className="icon-btn palette-btn" type="button" onClick={openPalette} aria-label={t('palette.open')} aria-keyshortcuts="Control+K Meta+K" title="⌘K">
+                        <Search />
+                    </button>
                     <button className="icon-btn" type="button" onClick={toggle} aria-label={t('nav.theme')}>
                         <Sun />
                     </button>
@@ -173,6 +197,7 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
             </footer>
 
             <Toast message={toast} onDone={clearToast} />
+            {paletteOpen && Palette ? <Palette onClose={closePalette} /> : null}
         </>
     );
 }

@@ -25,7 +25,7 @@ export interface SharedProps {
     app: { name: string; url: string };
     locale: Locale;
     locales: LocaleOption[];
-    urls: { home: string; contact: string; colophon: string };
+    urls: { home: string; contact: string; colophon: string; palette: string };
     translations: Record<TransKey, string>;
     hasNotes: boolean;
     hasNow: boolean;

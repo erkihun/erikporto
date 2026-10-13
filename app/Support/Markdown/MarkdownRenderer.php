@@ -7,7 +7,11 @@ namespace App\Support\Markdown;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Event\DocumentParsedEvent;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
+use League\CommonMark\Extension\CommonMark\Node\Block\FencedCode;
 use League\CommonMark\Extension\CommonMark\Node\Block\Heading;
+use League\CommonMark\Extension\CommonMark\Node\Block\IndentedCode;
+use League\CommonMark\Extension\CommonMark\Renderer\Block\FencedCodeRenderer;
+use League\CommonMark\Extension\CommonMark\Renderer\Block\IndentedCodeRenderer;
 use League\CommonMark\Extension\ExternalLink\ExternalLinkExtension;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
@@ -95,6 +99,9 @@ final class MarkdownRenderer
         $environment->addExtension(new HeadingPermalinkExtension);
         $environment->addExtension(new ExternalLinkExtension);
         $environment->addEventListener(DocumentParsedEvent::class, new ResponsiveMarkdownImages);
+        // Above the core renderers' priority (0): same output plus a focusable <pre>.
+        $environment->addRenderer(FencedCode::class, new FocusableCodeBlockRenderer(new FencedCodeRenderer), 10);
+        $environment->addRenderer(IndentedCode::class, new FocusableCodeBlockRenderer(new IndentedCodeRenderer), 10);
 
         return $this->converter = new MarkdownConverter($environment);
     }

@@ -40,6 +40,7 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 | Images | Uploads (JPEG/PNG/WebP, max 4 MB, no SVG) are registered on save with their size (`image_assets`), then the queued `ProcessUploadedImage` job rotates them upright, rewrites them without EXIF and writes WebP variants at 640/1280/1920 px. Pages get `{url, srcset, width, height}`; Markdown images get the same attributes. Replaced or removed images are deleted with their variants; `portfolio:images` (daily) processes leftovers and deletes orphaned uploads |
 | Error pages | `App\Http\Responses\ErrorPage` renders 403/404/429/500/503 as the Inertia page `Error` (404: org chart with a vacant node; 5xx: quiet, no navigation). Unknown URLs go through `Route::fallback` so the 404 is in the path's language. 419 returns to the form with a message. Admin, Livewire and JSON keep Laravel's responses; 500 keeps the debug page while `APP_DEBUG=true`. Renders even with the database down |
 | Colophon | `/colophon` (both languages) shows measured facts only: stack versions and first-view bytes from `public/build/build-meta.json` (written by `npm run build`), the visitor's own load time and LCP (PerformanceObserver), and the last CI run's test count and Lighthouse scores from `storage/app/quality.json` (CI publishes it to the `quality` release, deploy downloads it). `PORTFOLIO_REPO_URL` links the deployed commit |
+| Command palette | ⌘K / Ctrl+K (or the search button on desktop): sections, case studies and notes (`/palette.json`, fetched on first open), theme, language. Native `<dialog>` with an ARIA combobox and grouped listbox; its own 1.9 KB chunk |
 | Page data | `app/Queries/HomePageQuery.php` and `ProjectController`, both cached |
 | API contracts | `app/Http/Resources/*` ⇄ `resources/js/types/portfolio.ts` |
 | Contact workflow | `StoreContactMessageRequest` → `SubmitContactMessage` action → queued `NewContactMessage` notification |
@@ -87,5 +88,8 @@ npm run perf                       # Lighthouse CI: 4 pages × 3 runs, simulated
 ## Tests
 
 ```bash
-php artisan test
+php artisan test          # Pest: feature and unit tests (SQLite in memory)
+npm run build && npm run test:browser   # Playwright + axe against the production-like server
 ```
+
+The browser suite (`tests/Browser`) runs axe (WCAG 2.2 AA) on every page type in both themes and languages, desktop and mobile, and checks the skip link, the ⌘K command palette, view transitions and print. It needs Chromium (`npx playwright install chromium`) or `CHROME_PATH` pointing at an installed Chrome.

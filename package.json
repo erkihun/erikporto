@@ -10,7 +10,8 @@
         "dev": "vite",
         "types": "tsc --noEmit",
         "budgets": "node scripts/check-budgets.mjs",
-        "perf": "lhci autorun"
+        "perf": "lhci autorun",
+        "test:browser": "playwright test"
     },
     "devDependencies": {
         "@axe-core/playwright": "^4.13.0",
