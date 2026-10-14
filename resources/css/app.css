@@ -226,6 +226,8 @@ form.cf{display:flex;flex-direction:column;gap:14px}
 
 footer{position:relative;z-index:1;padding-block:40px 56px;color:var(--muted)}
 .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:center}
+/* WCAG 2.2 target size (2.5.8): the footer links are 12px mono, so pad them to 24px tall. */
+.foot a{display:inline-flex;align-items:center;min-height:24px}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;z-index:80;transition:transform .45s var(--ease),visibility .45s;font-size:14px;visibility:hidden}
 .toast.on{transform:translate(-50%,0);visibility:visible}
 

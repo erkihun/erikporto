@@ -176,6 +176,12 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
                         ) : null}
                     </span>
                     <span className="mono" style={{ display: 'flex', gap: 18 }}>
+                        {/* Phones hide the header's section links, so the footer carries Notes too. */}
+                        {hasNotes ? (
+                            <Link href="/notes" prefetch onFocus={prefetchNotes} style={{ textDecoration: 'none' }}>
+                                {t('nav.notes')}
+                            </Link>
+                        ) : null}
                         {hasNow ? (
                             <Link href="/now" prefetch onFocus={prefetchNow} style={{ textDecoration: 'none' }}>
                                 {t('footer.now')}
