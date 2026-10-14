@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useTrans } from '@/hooks/useTrans';
-import { whenIdle } from '@/lib/idle';
+import { whenLoadedAndIdle } from '@/lib/idle';
 import type { GraphMode, OrgGraphEngine } from '@/lib/org-graph-engine';
 import type { TransKey } from '@/types/inertia';
 
@@ -12,7 +12,7 @@ const MODE_COPY: Record<GraphMode, { label: TransKey; caption: TransKey; button:
 
 /**
  * Hero motion graphic. The stage and HUD are SSR'd so the layout is final at first
- * paint; the canvas engine is a separate chunk started when the browser is idle,
+ * paint; the canvas engine is a separate chunk started once the page has loaded and the browser is idle,
  * so it never delays rendering or LCP.
  */
 export function OrgGraph() {
@@ -40,7 +40,7 @@ export function OrgGraph() {
         if (!stage || !canvas) return;
 
         let disposed = false;
-        const cancelIdle = whenIdle(() => {
+        const cancelIdle = whenLoadedAndIdle(() => {
             void import('@/lib/org-graph-engine').then(({ startOrgGraph }) => {
                 if (!disposed) engineRef.current = startOrgGraph(stage, canvas, modeRef.current);
             });
