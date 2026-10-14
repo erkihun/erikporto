@@ -30,6 +30,14 @@ export const Search = (p: IconProps) => (
     </svg>
 );
 
+export const Menu = (p: IconProps) => (
+    <svg {...base} strokeLinecap="round" {...p}><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+);
+
+export const Close = (p: IconProps) => (
+    <svg {...base} strokeLinecap="round" {...p}><path d="M6 6l12 12M18 6L6 18" /></svg>
+);
+
 export function Monogram() {
     return (
         <svg viewBox="0 0 32 32" aria-hidden="true">

@@ -11,6 +11,8 @@
     "nav.theme": "Toggle colour theme",
     "nav.hire": "Hire me",
     "nav.language": "Language",
+    "nav.open_menu": "Open menu",
+    "nav.close_menu": "Close menu",
     "footer.back_to_top": "Back to top ↑",
     "footer.rss": "RSS",
     "footer.now": "Now",

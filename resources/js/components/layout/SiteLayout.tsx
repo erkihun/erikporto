@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { useCallback, useEffect, useState, type ComponentType, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ComponentType, type ReactNode } from 'react';
 
 import { usePrefetchOnFocus } from '@/hooks/usePrefetchOnFocus';
 import { useTheme } from '@/hooks/useTheme';
@@ -7,8 +7,15 @@ import { useTrans } from '@/hooks/useTrans';
 import { formatEthiopian } from '@/lib/ethiopian-calendar';
 import type { TransKey } from '@/types/inertia';
 
-import { Monogram, Search, Sun } from '../ui/icons';
+import { Menu, Monogram, Search, Sun } from '../ui/icons';
 import { Toast } from '../ui/Toast';
+
+type MobileMenuProps = {
+    sections: readonly (readonly [string, TransKey])[];
+    href: (id: string) => string;
+    hasNotes: boolean;
+    onClose: () => void;
+};
 
 const SECTIONS: readonly (readonly [string, TransKey])[] = [
     ['work', 'nav.work'],
@@ -55,6 +62,29 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
         });
     }, []);
     const closePalette = useCallback(() => setPaletteOpen(false), []);
+
+    // Phones hide .nav-links, so the same links open in a sheet; its own chunk, loaded on first use.
+    const [MobileMenu, setMobileMenu] = useState<ComponentType<MobileMenuProps> | null>(null);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const openMenu = useCallback(() => {
+        void import('./MobileMenu').then((module) => {
+            setMobileMenu(() => module.default);
+            setMenuOpen(true);
+        });
+    }, []);
+    // Closing is driven from React (see MobileMenu), so focus has to come back here by hand.
+    const menuButton = useRef<HTMLButtonElement>(null);
+    const closeMenu = useCallback(() => {
+        setMenuOpen(false);
+        // The dialog takes focus with it when it goes, so put it back on the trigger. Two frames:
+        // one for React to unmount the sheet, one for the browser to release focus from it.
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const button = menuButton.current ?? document.querySelector<HTMLButtonElement>('.menu-btn');
+                button?.focus();
+            });
+        });
+    }, []);
     useEffect(() => {
         const onKey = (event: KeyboardEvent) => {
             if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
@@ -147,6 +177,11 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
                     <button className="icon-btn" type="button" onClick={toggle} aria-label={t('nav.theme')}>
                         <Sun />
                     </button>
+                    {sections && links.length > 0 ? (
+                        <button ref={menuButton} className="icon-btn menu-btn" type="button" onClick={openMenu} aria-label={t('nav.open_menu')} aria-expanded={menuOpen}>
+                            <Menu />
+                        </button>
+                    ) : null}
                     {sections ? (
                         <a className="btn btn-primary btn-sm" href={href('contact')}>
                             {t('nav.hire')}
@@ -204,6 +239,7 @@ export function SiteLayout({ ownerName, isHome = false, sections = true, childre
 
             <Toast message={toast} onDone={clearToast} />
             {paletteOpen && Palette ? <Palette onClose={closePalette} /> : null}
+            {menuOpen && MobileMenu ? <MobileMenu sections={links} href={href} hasNotes={hasNotes} onClose={closeMenu} /> : null}
         </>
     );
 }
