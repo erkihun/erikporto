@@ -23,9 +23,11 @@ npm run build                    # type-check, client bundle, SSR bundle
 Local development:
 
 ```bash
+composer run dev                 # all of the below together (stops all if one fails)
+
 php artisan serve
 npm run dev
-php artisan queue:work           # sends contact-form notification emails
+php artisan queue:work           # contact notifications, image processing, Telegram
 ```
 
 Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
