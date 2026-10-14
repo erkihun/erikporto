@@ -62,6 +62,9 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 - Inertia's progress bar is replaced by `lib/navigation-progress.ts` because it injects an inline `<style>` the CSP refuses.
 
 ## Production checklist
+
+The full runbook (server setup, environment, deploys and rollbacks, backups and restoring) is in [docs/production.md](docs/production.md); configs are in `deploy/` (nginx, supervisor, cron, `deploy.sh`).
+
 - Production seeds only the admin user (`php artisan db:seed --force`). The home page shows a "coming soon" page until the profile is filled in at /admin.
 - `APP_ENV=production`, `APP_DEBUG=false` and the real `APP_URL`
 - `SESSION_ENCRYPT=true` and `SESSION_SECURE_COOKIE=true`
@@ -73,7 +76,8 @@ Open http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 - The scheduler cron (`* * * * * php artisan schedule:run`) so scheduled notes are announced on Telegram
 - Telegram (optional): create a bot with @BotFather, add it as an admin of your channel, set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHANNEL_ID`
 - `php artisan inertia:start-ssr` under Supervisor
-- `php artisan optimize` and `php artisan filament:optimize` on each deploy
+- `php artisan optimize` and `php artisan filament:optimize` on each deploy (`deploy/deploy.sh` does both)
+- Backups: `BACKUP_DISK` on another machine, `BACKUP_NOTIFICATION_EMAIL`, `BACKUP_ARCHIVE_PASSWORD`, and `mysqldump` installed (nightly, 7 daily + 4 weekly kept)
 - Real screenshots uploaded in **Admin → Projects → Media** to replace the illustrated placeholders
 
 ## Performance

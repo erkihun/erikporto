@@ -47,6 +47,15 @@ return [
             'report' => false,
         ],
 
+        // Default destination of the nightly backups (config/backup.php). On a server, point
+        // BACKUP_DISK at storage on another machine instead, e.g. 's3' below.
+        'backups' => [
+            'driver' => 'local',
+            'root' => storage_path('app/backups'),
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

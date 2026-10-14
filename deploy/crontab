@@ -1,0 +1,4 @@
+# Laravel scheduler (routes/console.php): Telegram announcements every 5 minutes, image
+# housekeeping and backups nightly, backup health check in the morning.
+# Install for the web user: `crontab -u www-data deploy/crontab`
+* * * * * cd /var/www/portfolio/current && php artisan schedule:run >> /dev/null 2>&1
