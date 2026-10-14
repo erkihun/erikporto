@@ -2,6 +2,8 @@
 
 Laravel 12 · Inertia 2 (React 19 + TypeScript, SSR) · Tailwind 4 · Filament 4 admin · Pest.
 
+Requires **PHP 8.3+** and Node 22 — the versions CI builds against.
+
 All public content lives in the database and is edited at **/admin**: profile, projects, capabilities, process, experience and education. Only the section headings are hard-coded.
 
 ## Setup
