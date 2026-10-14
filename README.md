@@ -6,6 +6,8 @@ All public content lives in the database and is edited at **/admin**: profile, p
 
 ## Setup
 
+Requires PHP 8.3 or newer (with `gd`, `intl`, `zip`, `pdo_sqlite`/`pdo_mysql`; `exif` recommended), Composer 2 and Node.js 22. Check with `php -v`: if another PHP comes first on the PATH, put the 8.3+ one before it (on Windows the machine PATH is searched before the user PATH), or `composer install` stops at its platform check.
+
 ```bash
 composer install
 npm install
